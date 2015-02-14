@@ -1,0 +1,39 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="at.ameise.moodtracker.activity.MainActivity">
+
+    <!-- This FrameLayout insets its children based on system windows using
+         android:fitsSystemWindows. -->
+    <FrameLayout android:layout_width="match_parent" android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:weightSum="100"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <fragment
+                android:layout_weight="10"
+                android:id="@+id/set_mood"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:name="at.ameise.moodtracker.fragment.EnterMoodFragment"
+                tools:layout="@layout/fragment_enter_mood">
+            </fragment>
+
+            <fragment
+                android:layout_weight="90"
+                android:id="@+id/get_mood"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:name="at.ameise.moodtracker.fragment.MoodHistoryFragment"
+                tools:layout="@layout/fragment_mood_history">
+            </fragment>
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+</FrameLayout>

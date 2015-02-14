@@ -1,0 +1,43 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="wrap_content" tools:context="at.ameise.moodtracker.fragment.EnterMoodFragment">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:weightSum="10"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <SeekBar
+                android:layout_width="wrap_content"
+                android:layout_weight="9"
+                android:layout_height="wrap_content"
+                android:id="@+id/sbCurrentMood"
+                android:splitTrack="false"
+                android:max="10"
+                android:indeterminate="false" />
+
+            <TextView
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_horizontal"
+                android:id="@+id/tvCurrentMood"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <Button
+                android:id="@+id/bUpdateCurrentMood"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Update"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</FrameLayout>
