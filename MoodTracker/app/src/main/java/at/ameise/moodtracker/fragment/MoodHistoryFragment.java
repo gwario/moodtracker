@@ -5,6 +5,7 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import at.ameise.moodtracker.ILoader;
+import at.ameise.moodtracker.ITag;
 import at.ameise.moodtracker.R;
 import at.ameise.moodtracker.domain.Mood;
 import at.ameise.moodtracker.domain.MoodCursorHelper;
@@ -30,6 +33,7 @@ import at.ameise.moodtracker.domain.MoodCursorHelper;
  * create an instance of this fragment.
  */
 public class MoodHistoryFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -75,6 +79,9 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        getLoaderManager().initLoader(ILoader.MOOD_HISTORY_LOADER, null, this);
+
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_mood_history, container, false);
     }
@@ -115,7 +122,7 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
 
             yVals.add(new LineDataSet(entries, "Me"));
         }
-
+        Log.i(ITag.TAG_MOOD_HISTORY, "Found "+data.getCount()+" moods");
         lineChart.setData(new LineData(xVals, yVals));
     }
 
