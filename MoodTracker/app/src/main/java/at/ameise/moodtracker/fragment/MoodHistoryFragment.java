@@ -1,7 +1,8 @@
 package at.ameise.moodtracker.fragment;
 
-import android.app.Activity;
-import android.net.Uri;
+import android.app.LoaderManager;
+import android.content.Loader;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.view.LayoutInflater;
@@ -13,21 +14,22 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import at.ameise.moodtracker.R;
+import at.ameise.moodtracker.domain.Mood;
+import at.ameise.moodtracker.domain.MoodCursorHelper;
 
 
 /**
  * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link MoodHistoryFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
  * Use the {@link MoodHistoryFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MoodHistoryFragment extends Fragment {
+public class MoodHistoryFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -82,20 +84,43 @@ public class MoodHistoryFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         lineChart = (LineChart) view.findViewById(R.id.lcMoodHistory);
-        Calendar now = Calendar.getInstance();
-        ArrayList<String> xVals = new ArrayList<>();
-        xVals.add(now.toString());
-        now.add(Calendar.HOUR, 24);
-        xVals.add(now.toString());
-        now.add(Calendar.HOUR, 24);
-        xVals.add(now.toString());
-        now.add(Calendar.HOUR, 24);
-        xVals.add(now.toString());
+    }
 
-        ArrayList<LineDataSet> yVals = new ArrayList<>();
-        yVals.add(new LineDataSet(new ArrayList<Entry>() {{ this.add(new Entry(2, 0));this.add(new Entry(2, 1));this.add(new Entry(3, 2));}}, "Me"));
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return MoodCursorHelper.getAllMoodsCursorLoader(getActivity());
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+        final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        final ArrayList<String> xVals = new ArrayList<>();
+        final ArrayList<LineDataSet> yVals = new ArrayList<>();
+
+        if(data.moveToFirst()) {
+
+            ArrayList<Entry> entries = new ArrayList<>();
+            int index = 0;
+
+            Mood mood = null;
+
+            do {
+
+                mood = MoodCursorHelper.fromCursor(data);
+                entries.add(index++, new Entry(mood.getMood(), index));
+                xVals.add(dateFormat.format(mood.getDate().getTime()));
+
+            } while(data.moveToNext());
+
+            yVals.add(new LineDataSet(entries, "Me"));
+        }
 
         lineChart.setData(new LineData(xVals, yVals));
     }
 
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+    }
 }

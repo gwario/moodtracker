@@ -1,6 +1,5 @@
 package at.ameise.moodtracker.fragment;
 
-import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.util.Log;
@@ -15,8 +14,8 @@ import android.widget.Toast;
 import java.util.Calendar;
 
 import at.ameise.moodtracker.R;
-import domain.Mood;
-import domain.MoodTableHelper;
+import at.ameise.moodtracker.domain.Mood;
+import at.ameise.moodtracker.domain.MoodCursorHelper;
 
 
 /**
@@ -25,6 +24,9 @@ import domain.MoodTableHelper;
  * create an instance of this fragment.
  */
 public class EnterMoodFragment extends Fragment implements SeekBar.OnSeekBarChangeListener, View.OnClickListener {
+
+    public static final String TAG = "EnterMoodFrag";
+
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -108,13 +110,12 @@ public class EnterMoodFragment extends Fragment implements SeekBar.OnSeekBarChan
 
         if(v.getId() == R.id.bUpdateCurrentMood) {
 
-            Toast.makeText(this.getActivity(), "Updated mood", Toast.LENGTH_LONG).show();
-
             final Mood currentMood = createMoodFromInput();
 
-            Log.v(TAG, "Created mood: "+currentMood.toString());
+            MoodCursorHelper.createMood(getActivity(), currentMood);
 
-            Uri resultUri = this.getActivity().getContentResolver().insert(Uri.EMPTY, MoodTableHelper.fromMood(currentMood));
+            Log.v(TAG, "Created mood: " + currentMood.toString());
+            Toast.makeText(this.getActivity(), "Updated mood", Toast.LENGTH_LONG).show();
         }
     }
 

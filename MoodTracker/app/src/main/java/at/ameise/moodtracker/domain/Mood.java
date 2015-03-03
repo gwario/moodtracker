@@ -1,4 +1,4 @@
-package domain;
+package at.ameise.moodtracker.domain;
 
 import java.util.Calendar;
 
@@ -7,7 +7,7 @@ import java.util.Calendar;
  */
 public class Mood {
 
-    private int id;
+    private Long id;
     private int mood;
     private Calendar date;
 
@@ -35,4 +35,13 @@ public class Mood {
     public void setMood(int mood) {
         this.mood = mood;
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
 }
