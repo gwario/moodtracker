@@ -25,6 +25,7 @@ import at.ameise.moodtracker.ITag;
 import at.ameise.moodtracker.R;
 import at.ameise.moodtracker.domain.Mood;
 import at.ameise.moodtracker.domain.MoodCursorHelper;
+import at.ameise.moodtracker.domain.MoodTableHelper;
 
 
 /**
@@ -95,11 +96,14 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+
         return MoodCursorHelper.getAllMoodsCursorLoader(getActivity());
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+        //lineChart.clear();
 
         final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         final ArrayList<String> xVals = new ArrayList<>();
@@ -114,7 +118,7 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
 
             do {
 
-                mood = MoodCursorHelper.fromCursor(data);
+                mood = MoodTableHelper.fromCursor(data);
                 entries.add(index++, new Entry(mood.getMood(), index));
                 xVals.add(dateFormat.format(mood.getDate().getTime()));
 
@@ -122,8 +126,9 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
 
             yVals.add(new LineDataSet(entries, "Me"));
         }
-        Log.i(ITag.TAG_MOOD_HISTORY, "Found "+data.getCount()+" moods");
+        Log.i(ITag.TAG_MOOD_HISTORY, "Found " + data.getCount() + " moods");
         lineChart.setData(new LineData(xVals, yVals));
+        lineChart.invalidate();
     }
 
     @Override

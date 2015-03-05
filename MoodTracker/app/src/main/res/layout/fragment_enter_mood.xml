@@ -19,7 +19,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/sbCurrentMood"
                 android:splitTrack="false"
-                android:max="10"
+                android:max="9"
                 android:indeterminate="false" />
 
             <TextView

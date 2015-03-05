@@ -215,9 +215,11 @@ public class MoodContentProvider extends ContentProvider {
                 throw new IllegalArgumentException("Unknown URI: " + uri);
         }
 
-        getContext().getContentResolver().notifyChange(uri, null);
+        final Cursor c = queryBuilder.query(db, projection, selection, selectionArgs, null, null, sortOrder);
 
-        return queryBuilder.query(db, projection, selection, selectionArgs, null, null, sortOrder);
+        c.setNotificationUri(getContext().getContentResolver(), uri);
+
+        return c;
     }
 
     /**

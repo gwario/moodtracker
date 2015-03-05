@@ -1,6 +1,9 @@
 package at.ameise.moodtracker.domain;
 
 import android.content.ContentValues;
+import android.database.Cursor;
+
+import java.util.Calendar;
 
 /**
  * Created by Mario Gastegger <mario DOT gastegger AT gmail DOT com> on 14.02.15.
@@ -42,5 +45,22 @@ public class MoodTableHelper {
         values.put(COL_TIMESTAMP, mood.getDate().getTimeInMillis() / 1000);
 
         return values;
+    }
+
+    /**
+     * @param cursor    cursor pointing to a row
+     * @return the {@link at.ameise.moodtracker.domain.Mood} at the current cursor position.
+     */
+    public static Mood fromCursor(Cursor cursor) {
+
+        final Mood mood = new Mood();
+
+        mood.setId(cursor.getLong(cursor.getColumnIndexOrThrow(MoodTableHelper.COL_ID)));
+        mood.setMood(cursor.getInt(cursor.getColumnIndexOrThrow(MoodTableHelper.COL_MOOD)));
+        Calendar timestamp = Calendar.getInstance();
+        timestamp.setTimeInMillis(1000 * cursor.getLong(cursor.getColumnIndexOrThrow(MoodTableHelper.COL_TIMESTAMP)));
+        mood.setDate(timestamp);
+
+        return mood;
     }
 }

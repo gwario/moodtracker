@@ -8,4 +8,5 @@ package at.ameise.moodtracker;
 public interface ITag {
 
     static final String TAG_MOOD_HISTORY = "MoodHistory";
+    static final String TAG_ENTER_MOOD = "EnterMood";
 }

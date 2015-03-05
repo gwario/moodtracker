@@ -17,8 +17,22 @@
             </intent-filter>
         </activity>
 
-        <provider android:name=".domain.MoodContentProvider" android:authorities="at.ameise.moodtracker.contentprovider" android:enabled="true" android:exported="true">
+        <provider
+            android:name=".domain.MoodContentProvider"
+            android:authorities="at.ameise.moodtracker.contentprovider"
+            android:enabled="true"
+            android:exported="true" >
         </provider>
+
+        <receiver android:name=".widget.EnterMoodWidget" >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/enter_mood_widget_info" />
+        </receiver>
     </application>
 
 </manifest>

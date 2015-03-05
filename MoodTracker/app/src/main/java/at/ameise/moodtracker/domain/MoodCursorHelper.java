@@ -117,20 +117,4 @@ public final class MoodCursorHelper {
         context.getContentResolver().delete(MoodContentProvider.getCONTENT_URI_MOOD_DATE_RANGE(fromTimestamp, toTimestamp), null, null);
     }
 
-    /**
-     * @param cursor    cursor pointing to a row
-     * @return the {@link at.ameise.moodtracker.domain.Mood} at the current cursor position.
-     */
-    public static Mood fromCursor(Cursor cursor) {
-
-        final Mood mood = new Mood();
-
-        mood.setId(cursor.getLong(cursor.getColumnIndexOrThrow(MoodTableHelper.COL_ID)));
-        mood.setMood(cursor.getInt(cursor.getColumnIndexOrThrow(MoodTableHelper.COL_MOOD)));
-        Calendar timestamp = Calendar.getInstance();
-        timestamp.setTimeInMillis(cursor.getLong(cursor.getColumnIndexOrThrow(MoodTableHelper.COL_TIMESTAMP)));
-        mood.setDate(timestamp);
-
-        return mood;
-    }
 }

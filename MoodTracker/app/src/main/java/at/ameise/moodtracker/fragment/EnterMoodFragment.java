@@ -3,7 +3,9 @@ package at.ameise.moodtracker.fragment;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -23,7 +25,7 @@ import at.ameise.moodtracker.domain.MoodCursorHelper;
  * Use the {@link EnterMoodFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class EnterMoodFragment extends Fragment implements SeekBar.OnSeekBarChangeListener, View.OnClickListener {
+public class EnterMoodFragment extends Fragment implements SeekBar.OnSeekBarChangeListener, View.OnClickListener, View.OnTouchListener {
 
     public static final String TAG = "EnterMoodFrag";
 
@@ -39,6 +41,7 @@ public class EnterMoodFragment extends Fragment implements SeekBar.OnSeekBarChan
     private SeekBar sbCurrentMood;
     private TextView tvCurrentMood;
     private Button bUpdateCurrentMood;
+    private GestureDetector mCurrentMoodDoubleTapGestureDetector;
 
     /**
      * Use this factory method to create a new instance of
@@ -69,6 +72,16 @@ public class EnterMoodFragment extends Fragment implements SeekBar.OnSeekBarChan
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+        mCurrentMoodDoubleTapGestureDetector = new GestureDetector(this.getActivity(), new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onDoubleTap(MotionEvent e) {
+
+                //pass to the click handler of the update button
+                EnterMoodFragment.this.onClick(EnterMoodFragment.this.bUpdateCurrentMood);
+                return true;
+            }
+        });
     }
 
     @Override
@@ -87,14 +100,16 @@ public class EnterMoodFragment extends Fragment implements SeekBar.OnSeekBarChan
         bUpdateCurrentMood = (Button) view.findViewById(R.id.bUpdateCurrentMood);
 
         sbCurrentMood.setProgress(5);
-        //tvCurrentMood.setText("0/10");
+        tvCurrentMood.setText("6/10");
+
         sbCurrentMood.setOnSeekBarChangeListener(this);
+        sbCurrentMood.setOnTouchListener(this);
         bUpdateCurrentMood.setOnClickListener(this);
     }
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        tvCurrentMood.setText(progress+"/10");
+        tvCurrentMood.setText((progress + 1)+"/10");
     }
 
     @Override
@@ -122,9 +137,20 @@ public class EnterMoodFragment extends Fragment implements SeekBar.OnSeekBarChan
     private Mood createMoodFromInput() {
 
         final Mood mood = new Mood();
+
         mood.setDate(Calendar.getInstance());
-        mood.setMood(sbCurrentMood.getProgress());
+        mood.setMood(sbCurrentMood.getProgress() + 1);
 
         return mood;
     }
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+
+        if(v.getId() == R.id.sbCurrentMood)
+            mCurrentMoodDoubleTapGestureDetector.onTouchEvent(event);
+
+        return false;
+    }
+
 }
