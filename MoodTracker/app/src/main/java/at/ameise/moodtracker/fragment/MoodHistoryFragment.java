@@ -103,8 +103,6 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
-        //lineChart.clear();
-
         final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         final ArrayList<String> xVals = new ArrayList<>();
         final ArrayList<LineDataSet> yVals = new ArrayList<>();
@@ -119,12 +117,13 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
             do {
 
                 mood = MoodTableHelper.fromCursor(data);
-                entries.add(index++, new Entry(mood.getMood(), index));
+                entries.add(index, new Entry(mood.getMood(), index));
                 xVals.add(dateFormat.format(mood.getDate().getTime()));
+                index++;
 
             } while(data.moveToNext());
 
-            yVals.add(new LineDataSet(entries, "Me"));
+            yVals.add(new LineDataSet(entries, "Mood history"));
         }
         Log.i(ITag.TAG_MOOD_HISTORY, "Found " + data.getCount() + " moods");
         lineChart.setData(new LineData(xVals, yVals));

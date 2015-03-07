@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- the initial mood; the mood, set on mood resets -->
+    <integer name="default_mood">4</integer>
+    <!-- the maximum -->
+    <integer name="max_mood">7</integer>
+</resources>

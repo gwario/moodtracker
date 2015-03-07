@@ -7,8 +7,5 @@ package at.ameise.moodtracker;
  */
 public interface ISetting {
 
-    /**
-     * The default mood on resets...
-     */
-    static final int DEFAULT_MOOD = 5;
+
 }

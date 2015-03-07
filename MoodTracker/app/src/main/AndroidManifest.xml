@@ -24,7 +24,8 @@
             android:exported="true" >
         </provider>
 
-        <receiver android:name=".widget.EnterMoodWidget" >
+        <receiver android:name=".widget.EnterMoodWidget"
+            android:label="MoodTracker entry widget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>

@@ -15,6 +15,8 @@ import android.widget.Toast;
 
 import java.util.Calendar;
 
+import at.ameise.moodtracker.ISetting;
+import at.ameise.moodtracker.ITag;
 import at.ameise.moodtracker.R;
 import at.ameise.moodtracker.domain.Mood;
 import at.ameise.moodtracker.domain.MoodCursorHelper;
@@ -42,6 +44,8 @@ public class EnterMoodFragment extends Fragment implements SeekBar.OnSeekBarChan
     private TextView tvCurrentMood;
     private Button bUpdateCurrentMood;
     private GestureDetector mCurrentMoodDoubleTapGestureDetector;
+
+    private int maxMood;
 
     /**
      * Use this factory method to create a new instance of
@@ -99,17 +103,21 @@ public class EnterMoodFragment extends Fragment implements SeekBar.OnSeekBarChan
         tvCurrentMood = (TextView) view.findViewById(R.id.tvCurrentMood);
         bUpdateCurrentMood = (Button) view.findViewById(R.id.bUpdateCurrentMood);
 
-        sbCurrentMood.setProgress(5);
-        tvCurrentMood.setText("6/10");
-
         sbCurrentMood.setOnSeekBarChangeListener(this);
         sbCurrentMood.setOnTouchListener(this);
         bUpdateCurrentMood.setOnClickListener(this);
+
+        sbCurrentMood.setMax(getResources().getInteger(R.integer.max_mood) - 1);// this is a necessary scale correction for the seek bar
+        sbCurrentMood.setProgress(getResources().getInteger(R.integer.default_mood) - 1);
     }
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        tvCurrentMood.setText((progress + 1)+"/10");
+
+        final int currentMood = getMoodFromSeekbar();
+
+        tvCurrentMood.setText(currentMood+"/"+getResources().getInteger(R.integer.max_mood));
+        Log.v(ITag.TAG_ENTER_MOOD, "Set current mood to " + currentMood);
     }
 
     @Override
@@ -129,7 +137,7 @@ public class EnterMoodFragment extends Fragment implements SeekBar.OnSeekBarChan
 
             MoodCursorHelper.createMood(getActivity(), currentMood);
 
-            Log.v(TAG, "Created mood: " + currentMood.toString());
+            Log.v(TAG, "Created " + currentMood.toString());
             Toast.makeText(this.getActivity(), "Updated mood", Toast.LENGTH_LONG).show();
         }
     }
@@ -139,7 +147,7 @@ public class EnterMoodFragment extends Fragment implements SeekBar.OnSeekBarChan
         final Mood mood = new Mood();
 
         mood.setDate(Calendar.getInstance());
-        mood.setMood(sbCurrentMood.getProgress() + 1);
+        mood.setMood(getMoodFromSeekbar());
 
         return mood;
     }
@@ -151,6 +159,14 @@ public class EnterMoodFragment extends Fragment implements SeekBar.OnSeekBarChan
             mCurrentMoodDoubleTapGestureDetector.onTouchEvent(event);
 
         return false;
+    }
+
+    /**
+     * @return The actual mood. This is the scale corrected value of the progress of the seek bar.
+     */
+    private final int getMoodFromSeekbar() {
+
+        return sbCurrentMood.getProgress() + 1;
     }
 
 }

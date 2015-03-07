@@ -27,7 +27,18 @@ public class EnterMoodWidget extends AppWidgetProvider {
     private static final String ACTION_UPDATE_CLICKED = "at.ameise.moodtracker.action.updateButtonClick";
     private static final String ACTION_MOOD_CLICKED_PREFIX = "at.ameise.moodtracker.action.moodButtonClick.";
 
-    private static int currentMoodInt = ISetting.DEFAULT_MOOD;
+    private static int currentMoodInt = -1;
+
+    private static final int[] MOOD_BUTTONS = {
+        R.id.ibCurrentMoodWidget0,
+        R.id.ibCurrentMoodWidget1,
+        R.id.ibCurrentMoodWidget2,
+        R.id.ibCurrentMoodWidget3,
+        R.id.ibCurrentMoodWidget4,
+        R.id.ibCurrentMoodWidget5,
+        R.id.ibCurrentMoodWidget6,
+    };
+
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
@@ -61,16 +72,8 @@ public class EnterMoodWidget extends AppWidgetProvider {
         final ComponentName watchWidget = new ComponentName(context, EnterMoodWidget.class);
 
         remoteViews.setOnClickPendingIntent(R.id.ibUpdateCurrentMoodWidget, getPendingSelfIntent(context, ACTION_UPDATE_CLICKED, null));
-        remoteViews.setOnClickPendingIntent(R.id.ibCurrentMoodWidget0, getPendingSelfIntent(context, getMoodButtonAction(0), null));
-        remoteViews.setOnClickPendingIntent(R.id.ibCurrentMoodWidget1, getPendingSelfIntent(context, getMoodButtonAction(1), null));
-        remoteViews.setOnClickPendingIntent(R.id.ibCurrentMoodWidget2, getPendingSelfIntent(context, getMoodButtonAction(2), null));
-        remoteViews.setOnClickPendingIntent(R.id.ibCurrentMoodWidget3, getPendingSelfIntent(context, getMoodButtonAction(3), null));
-        remoteViews.setOnClickPendingIntent(R.id.ibCurrentMoodWidget4, getPendingSelfIntent(context, getMoodButtonAction(4), null));
-        remoteViews.setOnClickPendingIntent(R.id.ibCurrentMoodWidget5, getPendingSelfIntent(context, getMoodButtonAction(5), null));
-        remoteViews.setOnClickPendingIntent(R.id.ibCurrentMoodWidget6, getPendingSelfIntent(context, getMoodButtonAction(6), null));
-        remoteViews.setOnClickPendingIntent(R.id.ibCurrentMoodWidget7, getPendingSelfIntent(context, getMoodButtonAction(7), null));
-        remoteViews.setOnClickPendingIntent(R.id.ibCurrentMoodWidget8, getPendingSelfIntent(context, getMoodButtonAction(8), null));
-        remoteViews.setOnClickPendingIntent(R.id.ibCurrentMoodWidget9, getPendingSelfIntent(context, getMoodButtonAction(9), null));
+        for(int i = 0; i < MOOD_BUTTONS.length; i++)
+        remoteViews.setOnClickPendingIntent(MOOD_BUTTONS[i], getPendingSelfIntent(context, getMoodButtonAction(i), null));
 
         // Instruct the widget manager to update the widget
         appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
@@ -101,17 +104,17 @@ public class EnterMoodWidget extends AppWidgetProvider {
 
             final Mood currentMood = new Mood();
             currentMood.setDate(Calendar.getInstance());
-            currentMood.setMood(currentMoodInt);
+            currentMood.setMood(getCurrentMood(context));
             MoodCursorHelper.createMood(context, currentMood);
 
-            Log.v(ITag.TAG_ENTER_MOOD, "Created mood: " + currentMood.toString());
+            Log.v(ITag.TAG_ENTER_MOOD, "Created: " + currentMood.toString());
             Toast.makeText(context, "Updated mood", Toast.LENGTH_LONG).show();
 
-            setDefaultMoodOnButtons(remoteViews);
+            setDefaultMoodOnButtons(context, remoteViews);
 
         } else if (intent.getAction() != null && intent.getAction().startsWith(ACTION_MOOD_CLICKED_PREFIX)) {
 
-            int buttonIndex = getButtonIndexFromAction(intent.getAction());
+            int buttonIndex = getButtonIndexFromAction(context, intent.getAction());
             Log.v(ITag.TAG_ENTER_MOOD, "ButtonIndex: " + buttonIndex);
 
             currentMoodInt = getMoodFromButtonIndex(buttonIndex);
@@ -123,6 +126,18 @@ public class EnterMoodWidget extends AppWidgetProvider {
         appWidgetManager.updateAppWidget(thisWidget, remoteViews);
     }
 
+    /**
+     * @param context
+     * @return the current mood or the default mood if not set
+     */
+    private static int getCurrentMood(Context context) {
+
+        if(currentMoodInt < 0)
+            return context.getResources().getInteger(R.integer.default_mood);
+        else
+            return currentMoodInt;
+    }
+
     private static final int getMoodFromButtonIndex(int buttonIndex) {
 
         return buttonIndex + 1;
@@ -131,7 +146,7 @@ public class EnterMoodWidget extends AppWidgetProvider {
      * @param action
      * @return the button index according to the action.
      */
-    private static int getButtonIndexFromAction(String action) {
+    private static int getButtonIndexFromAction(Context context, String action) {
 
         try {
 
@@ -141,7 +156,7 @@ public class EnterMoodWidget extends AppWidgetProvider {
 
             Log.e(ITag.TAG_ENTER_MOOD, "Failed to get button index, using default!", e);
 
-            return ISetting.DEFAULT_MOOD;
+            return context.getResources().getInteger(R.integer.default_mood);
         }
     }
 
@@ -165,18 +180,11 @@ public class EnterMoodWidget extends AppWidgetProvider {
      * Updates the state of the buttons to the default mood.
      * @param remoteViews
      */
-    private static final void setDefaultMoodOnButtons(RemoteViews remoteViews) {
+    private static final void setDefaultMoodOnButtons(Context context, RemoteViews remoteViews) {
 
-        remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget0, R.drawable.glyphicons_13_heart);
-        remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget1, R.drawable.glyphicons_13_heart);
-        remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget2, R.drawable.glyphicons_13_heart);
-        remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget3, R.drawable.glyphicons_13_heart);
-        remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget4, R.drawable.glyphicons_13_heart);
-        remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget5, R.drawable.glyphicons_13_heart);
-        remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget6, R.drawable.glyphicons_20_heart_empty);
-        remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget7, R.drawable.glyphicons_20_heart_empty);
-        remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget8, R.drawable.glyphicons_20_heart_empty);
-        remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget9, R.drawable.glyphicons_20_heart_empty);
+        final int buttonIndex = context.getResources().getInteger(R.integer.default_mood) - 1;
+
+        setCurrentMoodOnButtons(remoteViews, buttonIndex);
     }
 
     /**
@@ -186,127 +194,14 @@ public class EnterMoodWidget extends AppWidgetProvider {
      */
     private static final void setCurrentMoodOnButtons(RemoteViews remoteViews, int buttonIndex) {
 
-        switch (buttonIndex) {
-            case 0:
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget0, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget1, R.drawable.glyphicons_20_heart_empty);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget2, R.drawable.glyphicons_20_heart_empty);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget3, R.drawable.glyphicons_20_heart_empty);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget4, R.drawable.glyphicons_20_heart_empty);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget5, R.drawable.glyphicons_20_heart_empty);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget6, R.drawable.glyphicons_20_heart_empty);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget7, R.drawable.glyphicons_20_heart_empty);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget8, R.drawable.glyphicons_20_heart_empty);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget9, R.drawable.glyphicons_20_heart_empty);
-                break;
-            case 1:
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget0, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget1, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget2, R.drawable.glyphicons_20_heart_empty);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget3, R.drawable.glyphicons_20_heart_empty);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget4, R.drawable.glyphicons_20_heart_empty);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget5, R.drawable.glyphicons_20_heart_empty);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget6, R.drawable.glyphicons_20_heart_empty);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget7, R.drawable.glyphicons_20_heart_empty);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget8, R.drawable.glyphicons_20_heart_empty);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget9, R.drawable.glyphicons_20_heart_empty);
-                break;
-            case 2:
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget0, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget1, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget2, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget3, R.drawable.glyphicons_20_heart_empty);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget4, R.drawable.glyphicons_20_heart_empty);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget5, R.drawable.glyphicons_20_heart_empty);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget6, R.drawable.glyphicons_20_heart_empty);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget7, R.drawable.glyphicons_20_heart_empty);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget8, R.drawable.glyphicons_20_heart_empty);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget9, R.drawable.glyphicons_20_heart_empty);
-                break;
-            case 3:
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget0, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget1, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget2, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget3, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget4, R.drawable.glyphicons_20_heart_empty);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget5, R.drawable.glyphicons_20_heart_empty);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget6, R.drawable.glyphicons_20_heart_empty);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget7, R.drawable.glyphicons_20_heart_empty);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget8, R.drawable.glyphicons_20_heart_empty);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget9, R.drawable.glyphicons_20_heart_empty);
-                break;
-            case 4:
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget0, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget1, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget2, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget3, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget4, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget5, R.drawable.glyphicons_20_heart_empty);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget6, R.drawable.glyphicons_20_heart_empty);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget7, R.drawable.glyphicons_20_heart_empty);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget8, R.drawable.glyphicons_20_heart_empty);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget9, R.drawable.glyphicons_20_heart_empty);
-                break;
-            case 5:
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget0, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget1, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget2, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget3, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget4, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget5, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget6, R.drawable.glyphicons_20_heart_empty);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget7, R.drawable.glyphicons_20_heart_empty);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget8, R.drawable.glyphicons_20_heart_empty);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget9, R.drawable.glyphicons_20_heart_empty);
-                break;
-            case 6:
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget0, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget1, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget2, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget3, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget4, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget5, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget6, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget7, R.drawable.glyphicons_20_heart_empty);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget8, R.drawable.glyphicons_20_heart_empty);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget9, R.drawable.glyphicons_20_heart_empty);
-                break;
-            case 7:
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget0, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget1, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget2, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget3, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget4, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget5, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget6, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget7, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget8, R.drawable.glyphicons_20_heart_empty);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget9, R.drawable.glyphicons_20_heart_empty);
-                break;
-            case 8:
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget0, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget1, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget2, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget3, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget4, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget5, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget6, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget7, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget8, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget9, R.drawable.glyphicons_20_heart_empty);
-                break;
-            case 9:
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget0, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget1, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget2, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget3, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget4, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget5, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget6, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget7, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget8, R.drawable.glyphicons_13_heart);
-                remoteViews.setImageViewResource(R.id.ibCurrentMoodWidget9, R.drawable.glyphicons_13_heart);
-                break;
+        for(int i = 0; i < MOOD_BUTTONS.length; i++) {
+
+            final int buttonResId = MOOD_BUTTONS[i];
+
+            if(i <= buttonIndex)
+                remoteViews.setImageViewResource(buttonResId, R.drawable.glyphicons_13_heart);
+            else
+                remoteViews.setImageViewResource(buttonResId, R.drawable.glyphicons_20_heart_empty);
         }
     }
 }
