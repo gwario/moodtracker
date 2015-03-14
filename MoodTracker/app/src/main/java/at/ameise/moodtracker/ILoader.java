@@ -7,5 +7,8 @@ package at.ameise.moodtracker;
  */
 public interface ILoader {
 
-    static final int MOOD_HISTORY_LOADER = 1;
+    static final int MOOD_HISTORY_ALL_VALUES_LOADER = 0;
+    static final int MOOD_HISTORY_PER_DAY_LOADER = 1;
+    static final int MOOD_HISTORY_PER_WEEK_LOADER = 2;
+    static final int MOOD_HISTORY_PER_MONTH_LOADER = 3;
 }

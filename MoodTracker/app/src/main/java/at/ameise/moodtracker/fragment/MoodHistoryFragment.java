@@ -7,6 +7,9 @@ import android.os.Bundle;
 import android.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -75,16 +78,50 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+        setHasOptionsMenu(true);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        getLoaderManager().initLoader(ILoader.MOOD_HISTORY_LOADER, null, this);
+        //default loader
+        getLoaderManager().initLoader(ILoader.MOOD_HISTORY_ALL_VALUES_LOADER, null, this);
 
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_mood_history, container, false);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.mood_history, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.optAllValues:
+                getLoaderManager().restartLoader(ILoader.MOOD_HISTORY_ALL_VALUES_LOADER, null, this);
+                return true;
+
+            case R.id.optGbDay:
+                getLoaderManager().restartLoader(ILoader.MOOD_HISTORY_PER_DAY_LOADER, null, this);
+                return true;
+
+            case R.id.optGbWeek:
+                getLoaderManager().restartLoader(ILoader.MOOD_HISTORY_PER_WEEK_LOADER, null, this);
+                return true;
+
+            case R.id.optGbMonth:
+                getLoaderManager().restartLoader(ILoader.MOOD_HISTORY_PER_MONTH_LOADER, null, this);
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
@@ -97,7 +134,30 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
-        return MoodCursorHelper.getAllMoodsCursorLoader(getActivity());
+        final Loader<Cursor> loader;
+
+        switch(id) {
+            case ILoader.MOOD_HISTORY_ALL_VALUES_LOADER:
+                loader = MoodCursorHelper.getAllMoodsCursorLoader(getActivity());
+                break;
+
+            case ILoader.MOOD_HISTORY_PER_DAY_LOADER:
+                loader = MoodCursorHelper.getAllMoodsAvgDayCursorLoader(getActivity());
+                break;
+
+            case ILoader.MOOD_HISTORY_PER_WEEK_LOADER:
+                loader = MoodCursorHelper.getAllMoodsAvgWeekCursorLoader(getActivity());
+                break;
+
+            case ILoader.MOOD_HISTORY_PER_MONTH_LOADER:
+                loader = MoodCursorHelper.getAllMoodsAvgMonthCursorLoader(getActivity());
+                break;
+
+            default:
+                throw new AssertionError("Not yet implemented! id="+id);
+        }
+
+        return loader;
     }
 
     @Override

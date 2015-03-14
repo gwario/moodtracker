@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 
 import java.util.Calendar;
@@ -27,6 +28,33 @@ public final class MoodCursorHelper {
     public static Loader<Cursor> getAllMoodsCursorLoader(Context context) {
 
         return new CursorLoader(context, MoodContentProvider.CONTENT_URI_MOOD, null, null, null, MoodTableHelper.SORT_ORDER_TIMESTAMP_ASC);
+    }
+
+    /**
+     * @param context   the context
+     * @return a {@link CursorLoader} on the day-average of all {@link at.ameise.moodtracker.domain.Mood}s.
+     */
+    public static Loader<Cursor> getAllMoodsAvgDayCursorLoader(Context context) {
+
+        return new CursorLoader(context, MoodContentProvider.CONTENT_URI_MOOD_GB_DAY, null, null, null, MoodTableHelper.SORT_ORDER_TIMESTAMP_ASC);
+    }
+
+    /**
+     * @param context   the context
+     * @return a {@link CursorLoader} on the week-average of all {@link at.ameise.moodtracker.domain.Mood}s.
+     */
+    public static Loader<Cursor> getAllMoodsAvgWeekCursorLoader(Context context) {
+
+        return new CursorLoader(context, MoodContentProvider.CONTENT_URI_MOOD_GB_WEEK, null, null, null, MoodTableHelper.SORT_ORDER_TIMESTAMP_ASC);
+    }
+
+    /**
+     * @param context   the context
+     * @return a {@link CursorLoader} on the month-average of all {@link at.ameise.moodtracker.domain.Mood}s.
+     */
+    public static Loader<Cursor> getAllMoodsAvgMonthCursorLoader(Context context) {
+
+        return new CursorLoader(context, MoodContentProvider.CONTENT_URI_MOOD_GB_MONTH, null, null, null, MoodTableHelper.SORT_ORDER_TIMESTAMP_ASC);
     }
 
     /**
@@ -115,6 +143,15 @@ public final class MoodCursorHelper {
     public static void removeMood(Context context, Calendar fromTimestamp, Calendar toTimestamp) {
 
         context.getContentResolver().delete(MoodContentProvider.getCONTENT_URI_MOOD_DATE_RANGE(fromTimestamp, toTimestamp), null, null);
+    }
+
+    /**
+     * @param database
+     * @return a {@link android.database.Cursor} containing all the timestamps in ascending order.
+     */
+    static Cursor getAllTimestamps(SQLiteDatabase database) {
+
+        return database.query(MoodTableHelper.TABLE_NAME, new String[]{MoodTableHelper.COL_TIMESTAMP,}, null, null, null, null, MoodTableHelper.SORT_ORDER_TIMESTAMP_ASC);
     }
 
 }
