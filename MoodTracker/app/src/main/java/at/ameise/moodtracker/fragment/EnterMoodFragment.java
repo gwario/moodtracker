@@ -1,8 +1,7 @@
 package at.ameise.moodtracker.fragment;
 
-import android.os.Bundle;
 import android.app.Fragment;
-import android.util.Log;
+import android.os.Bundle;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -15,11 +14,11 @@ import android.widget.Toast;
 
 import java.util.Calendar;
 
-import at.ameise.moodtracker.ISetting;
 import at.ameise.moodtracker.ITag;
 import at.ameise.moodtracker.R;
 import at.ameise.moodtracker.domain.Mood;
 import at.ameise.moodtracker.domain.MoodCursorHelper;
+import at.ameise.moodtracker.util.Logger;
 
 
 /**
@@ -117,7 +116,7 @@ public class EnterMoodFragment extends Fragment implements SeekBar.OnSeekBarChan
         final int currentMood = getMoodFromSeekbar();
 
         tvCurrentMood.setText(currentMood+"/"+getResources().getInteger(R.integer.max_mood));
-        Log.v(ITag.TAG_ENTER_MOOD, "Set current mood to " + currentMood);
+        Logger.verbose(ITag.ENTER_MOOD, "Set current mood to " + currentMood);
     }
 
     @Override
@@ -137,7 +136,7 @@ public class EnterMoodFragment extends Fragment implements SeekBar.OnSeekBarChan
 
             MoodCursorHelper.createMood(getActivity(), currentMood);
 
-            Log.v(TAG, "Created " + currentMood.toString());
+            Logger.verbose(TAG, "Created " + currentMood.toString());
             Toast.makeText(this.getActivity(), "Updated mood", Toast.LENGTH_LONG).show();
         }
     }

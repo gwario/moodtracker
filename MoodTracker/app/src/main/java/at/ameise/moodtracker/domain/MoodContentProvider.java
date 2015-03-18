@@ -9,10 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
-import android.text.format.DateUtils;
-import android.util.Log;
 
-import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -21,6 +18,7 @@ import java.util.List;
 
 import at.ameise.moodtracker.ITag;
 import at.ameise.moodtracker.util.CalendarUtil;
+import at.ameise.moodtracker.util.Logger;
 
 public class MoodContentProvider extends ContentProvider {
 
@@ -237,7 +235,7 @@ public class MoodContentProvider extends ContentProvider {
                 queryBuilder.setTables(MoodTableHelper.TABLE_NAME);
 
                 String[] unionQueries = getGroupByDayUnionQuery(db);
-                Log.v(ITag.TAG_MOOD_PROVIDER, "# of days: "+unionQueries.length);
+                Logger.verbose(ITag.MOOD_PROVIDER, "# of days: " + unionQueries.length);
 
                 unionQueryString = queryBuilder.buildUnionQuery(unionQueries, null, null);
                 break;
@@ -247,7 +245,7 @@ public class MoodContentProvider extends ContentProvider {
                 queryBuilder.setTables(MoodTableHelper.TABLE_NAME);
 
                 unionQueries = getGroupByWeekUnionQuery(db);
-                Log.v(ITag.TAG_MOOD_PROVIDER, "# of weeks: " + unionQueries.length);
+                Logger.verbose(ITag.MOOD_PROVIDER, "# of weeks: " + unionQueries.length);
 
                 unionQueryString = queryBuilder.buildUnionQuery(unionQueries, null, null);
                 break;
@@ -257,7 +255,7 @@ public class MoodContentProvider extends ContentProvider {
                 queryBuilder.setTables(MoodTableHelper.TABLE_NAME);
 
                 unionQueries = getGroupByMonthUnionQuery(db);
-                Log.v(ITag.TAG_MOOD_PROVIDER, "# of months: " + unionQueries.length);
+                Logger.verbose(ITag.MOOD_PROVIDER, "# of months: " + unionQueries.length);
 
                 unionQueryString = queryBuilder.buildUnionQuery(unionQueries, null, null);
                 break;
@@ -289,12 +287,12 @@ public class MoodContentProvider extends ContentProvider {
         final Calendar fromDate = getFirstDate(c);
         final Calendar maxDate = getLastDate(c);
 
-        Log.v(ITag.TAG_MOOD_PROVIDER, "#dates: " + c.getCount());
+        Logger.verbose(ITag.MOOD_PROVIDER, "#dates: " + c.getCount());
 
         CalendarUtil.setStartOfMonth(fromDate);
         CalendarUtil.setEndOfMonth(maxDate);
-        Log.v(ITag.TAG_MOOD_PROVIDER, "initial fromDate: " + fromDate.toString());
-        Log.v(ITag.TAG_MOOD_PROVIDER, "maxDate: " + maxDate.toString());
+        Logger.verbose(ITag.MOOD_PROVIDER, "initial fromDate: " + fromDate.toString());
+        Logger.verbose(ITag.MOOD_PROVIDER, "maxDate: " + maxDate.toString());
 
 
         while(fromDate.before(maxDate)) {
@@ -306,7 +304,7 @@ public class MoodContentProvider extends ContentProvider {
             unionQueries.add(avgMoodSelectQueryString(startOfDaySec, endOfDaySec));
 
             fromDate.add(Calendar.MILLISECOND, 1);
-            Log.v(ITag.TAG_MOOD_PROVIDER, "next fromDate: " + fromDate.toString());
+            Logger.verbose(ITag.MOOD_PROVIDER, "next fromDate: " + fromDate.toString());
         }
 
         return unionQueries.toArray(new String[unionQueries.size()]);
@@ -324,12 +322,12 @@ public class MoodContentProvider extends ContentProvider {
         final Calendar fromDate = getFirstDate(c);
         final Calendar maxDate = getLastDate(c);
 
-        Log.v(ITag.TAG_MOOD_PROVIDER, "#dates: " + c.getCount());
+        Logger.verbose(ITag.MOOD_PROVIDER, "#dates: " + c.getCount());
 
         CalendarUtil.setStartOfWeek(fromDate);
         CalendarUtil.setEndOfWeek(maxDate);
-        Log.v(ITag.TAG_MOOD_PROVIDER, "initial fromDate: " + fromDate.toString());
-        Log.v(ITag.TAG_MOOD_PROVIDER, "maxDate: " + maxDate.toString());
+        Logger.verbose(ITag.MOOD_PROVIDER, "initial fromDate: " + fromDate.toString());
+        Logger.verbose(ITag.MOOD_PROVIDER, "maxDate: " + maxDate.toString());
 
 
         while(fromDate.before(maxDate)) {
@@ -341,7 +339,7 @@ public class MoodContentProvider extends ContentProvider {
             unionQueries.add(avgMoodSelectQueryString(startOfDaySec, endOfDaySec));
 
             fromDate.add(Calendar.MILLISECOND, 1);
-            Log.v(ITag.TAG_MOOD_PROVIDER, "next fromDate: " + fromDate.toString());
+            Logger.verbose(ITag.MOOD_PROVIDER, "next fromDate: " + fromDate.toString());
         }
 
         return unionQueries.toArray(new String[unionQueries.size()]);
@@ -358,12 +356,12 @@ public class MoodContentProvider extends ContentProvider {
         final Calendar fromDate = getFirstDate(c);
         final Calendar maxDate = getLastDate(c);
 
-        Log.v(ITag.TAG_MOOD_PROVIDER, "#dates: " + c.getCount());
+        Logger.verbose(ITag.MOOD_PROVIDER, "#dates: " + c.getCount());
 
         CalendarUtil.setStartOfDay(fromDate);
         CalendarUtil.setEndOfDay(maxDate);
-        Log.v(ITag.TAG_MOOD_PROVIDER, "initial fromDate: " + fromDate.toString());
-        Log.v(ITag.TAG_MOOD_PROVIDER, "maxDate: " + maxDate.toString());
+        Logger.verbose(ITag.MOOD_PROVIDER, "initial fromDate: " + fromDate.toString());
+        Logger.verbose(ITag.MOOD_PROVIDER, "maxDate: " + maxDate.toString());
 
 
         while(fromDate.before(maxDate)) {
@@ -375,7 +373,7 @@ public class MoodContentProvider extends ContentProvider {
             unionQueries.add(avgMoodSelectQueryString(startOfDaySec, endOfDaySec));
 
             fromDate.add(Calendar.MILLISECOND, 1);
-            Log.v(ITag.TAG_MOOD_PROVIDER, "next fromDate: " + fromDate.toString());
+            Logger.verbose(ITag.MOOD_PROVIDER, "next fromDate: " + fromDate.toString());
         }
 
         return unionQueries.toArray(new String[unionQueries.size()]);

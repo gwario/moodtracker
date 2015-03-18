@@ -25,13 +25,20 @@ public class MoodTableHelper {
     public static final String SORT_ORDER_TIMESTAMP_DESC = COL_TIMESTAMP + " desc";
 
 
-    static final String STMT_CREATE = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + "("
-            + COL_ID +" INTEGER PRIMARY KEY AUTOINCREMENT,"
-            + COL_TIMESTAMP +" TEXT NOT NULL UNIQUE ON CONFLICT REPLACE,"
-            + COL_MOOD +" INTEGER NOT NULL"
-            +")";
+    static final String STMT_CREATE = createStmtCreate(TABLE_NAME);
 
-    static final String STMT_DROP = "DROP TABLE "+TABLE_NAME;
+    /**
+     * @param tableName
+     * @return a create statement with for this schema with the specified table name.
+     */
+    static final String createStmtCreate(String tableName) {
+
+        return "CREATE TABLE IF NOT EXISTS " + tableName + "("
+                + COL_ID +" INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + COL_TIMESTAMP +" TEXT NOT NULL UNIQUE ON CONFLICT REPLACE,"
+                + COL_MOOD +" REAL NOT NULL"
+                +")";
+    }
 
     /**
      * @param mood
@@ -56,7 +63,7 @@ public class MoodTableHelper {
         final Mood mood = new Mood();
 
         mood.setId(cursor.getLong(cursor.getColumnIndexOrThrow(MoodTableHelper.COL_ID)));
-        mood.setMood(cursor.getInt(cursor.getColumnIndexOrThrow(MoodTableHelper.COL_MOOD)));
+        mood.setMood(cursor.getFloat(cursor.getColumnIndexOrThrow(MoodTableHelper.COL_MOOD)));
         Calendar timestamp = Calendar.getInstance();
         timestamp.setTimeInMillis(1000 * cursor.getLong(cursor.getColumnIndexOrThrow(MoodTableHelper.COL_TIMESTAMP)));
         mood.setDate(timestamp);

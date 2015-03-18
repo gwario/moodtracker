@@ -2,14 +2,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/optGbMonth"
         android:title="Monat"
-        android:showAsAction="ifRoom"/>
+        android:showAsAction="never"/>
     <item android:id="@+id/optGbWeek"
         android:title="Woche"
-        android:showAsAction="ifRoom"/>
+        android:showAsAction="never"/>
     <item android:id="@+id/optGbDay"
         android:title="Tag"
-        android:showAsAction="ifRoom"/>
+        android:showAsAction="never"/>
     <item android:id="@+id/optAllValues"
         android:title="Alle"
-        android:showAsAction="ifRoom"/>
+        android:icon=""
+        android:showAsAction="never"/>
 </menu>

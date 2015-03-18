@@ -1,11 +1,10 @@
 package at.ameise.moodtracker.fragment;
 
+import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,8 +19,6 @@ import com.github.mikephil.charting.data.LineDataSet;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
 
 import at.ameise.moodtracker.ILoader;
 import at.ameise.moodtracker.ITag;
@@ -29,6 +26,7 @@ import at.ameise.moodtracker.R;
 import at.ameise.moodtracker.domain.Mood;
 import at.ameise.moodtracker.domain.MoodCursorHelper;
 import at.ameise.moodtracker.domain.MoodTableHelper;
+import at.ameise.moodtracker.util.Logger;
 
 
 /**
@@ -185,7 +183,7 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
 
             yVals.add(new LineDataSet(entries, "Mood history"));
         }
-        Log.i(ITag.TAG_MOOD_HISTORY, "Found " + data.getCount() + " moods");
+        Logger.info(ITag.MOOD_HISTORY, "Found " + data.getCount() + " moods");
         lineChart.setData(new LineData(xVals, yVals));
         lineChart.invalidate();
     }

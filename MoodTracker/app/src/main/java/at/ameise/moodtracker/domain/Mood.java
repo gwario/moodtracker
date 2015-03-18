@@ -8,14 +8,14 @@ import java.util.Calendar;
 public class Mood {
 
     private Long id;
-    private int mood;
+    private float mood;
     private Calendar date;
 
     @Override
     public String toString() {
-        return "Mood{" +
-                "mood=" + mood +
-                ", date=" + date +
+        return "Mood {" +
+                "mood=" + mood + ", " +
+                "date=" + date +
                 '}';
     }
 
@@ -27,12 +27,12 @@ public class Mood {
         this.date = date;
     }
 
-    public int getMood() {
+    public float getMood() {
 
         return mood;
     }
 
-    public void setMood(int mood) {
+    public void setMood(float mood) {
         this.mood = mood;
     }
 

@@ -7,17 +7,16 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import java.util.Calendar;
 
-import at.ameise.moodtracker.ISetting;
 import at.ameise.moodtracker.ITag;
 import at.ameise.moodtracker.R;
 import at.ameise.moodtracker.domain.Mood;
 import at.ameise.moodtracker.domain.MoodCursorHelper;
+import at.ameise.moodtracker.util.Logger;
 
 /**
  * Implementation of App Widget functionality.
@@ -97,8 +96,8 @@ public class EnterMoodWidget extends AppWidgetProvider {
         final RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.enter_mood_widget);
         final ComponentName thisWidget = new ComponentName(context, EnterMoodWidget.class);
 
-        Log.d(ITag.TAG_ENTER_MOOD, "Intent: "+intent);
-        Log.d(ITag.TAG_ENTER_MOOD, "Extras: "+intent.getExtras());
+        Logger.debug(ITag.ENTER_MOOD, "Intent: " + intent);
+        Logger.debug(ITag.ENTER_MOOD, "Extras: " + intent.getExtras());
 
         if (ACTION_UPDATE_CLICKED.equals(intent.getAction())) {
 
@@ -107,7 +106,7 @@ public class EnterMoodWidget extends AppWidgetProvider {
             currentMood.setMood(getCurrentMood(context));
             MoodCursorHelper.createMood(context, currentMood);
 
-            Log.v(ITag.TAG_ENTER_MOOD, "Created: " + currentMood.toString());
+            Logger.verbose(ITag.ENTER_MOOD, "Created: " + currentMood.toString());
             Toast.makeText(context, "Updated mood", Toast.LENGTH_LONG).show();
 
             setDefaultMoodOnButtons(context, remoteViews);
@@ -115,10 +114,10 @@ public class EnterMoodWidget extends AppWidgetProvider {
         } else if (intent.getAction() != null && intent.getAction().startsWith(ACTION_MOOD_CLICKED_PREFIX)) {
 
             int buttonIndex = getButtonIndexFromAction(context, intent.getAction());
-            Log.v(ITag.TAG_ENTER_MOOD, "ButtonIndex: " + buttonIndex);
+            Logger.verbose(ITag.ENTER_MOOD, "ButtonIndex: " + buttonIndex);
 
             currentMoodInt = getMoodFromButtonIndex(buttonIndex);
-            Log.v(ITag.TAG_ENTER_MOOD, "Set current mood to " + currentMoodInt);
+            Logger.verbose(ITag.ENTER_MOOD, "Set current mood to " + currentMoodInt);
 
             setCurrentMoodOnButtons(remoteViews, buttonIndex);
         }
@@ -154,7 +153,7 @@ public class EnterMoodWidget extends AppWidgetProvider {
 
         } catch (NumberFormatException e) {
 
-            Log.e(ITag.TAG_ENTER_MOOD, "Failed to get button index, using default!", e);
+            Logger.error(ITag.ENTER_MOOD, "Failed to get button index, using default!", e);
 
             return context.getResources().getInteger(R.integer.default_mood);
         }

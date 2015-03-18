@@ -10,10 +10,6 @@ import android.net.Uri;
 
 import java.util.Calendar;
 
-import at.ameise.moodtracker.domain.Mood;
-import at.ameise.moodtracker.domain.MoodContentProvider;
-import at.ameise.moodtracker.domain.MoodTableHelper;
-
 /**
  * Contains helper methods to operate on the mood database.
  *
