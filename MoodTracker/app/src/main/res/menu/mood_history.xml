@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/optGbMonth"
+        android:icon="@drawable/glyphicons_156_show_months"
         android:title="Monat"
         android:showAsAction="never"/>
     <item android:id="@+id/optGbWeek"
+        android:icon="@drawable/glyphicons_157_show_weeks"
         android:title="Woche"
         android:showAsAction="never"/>
     <item android:id="@+id/optGbDay"
+        android:icon="@drawable/glyphicons_159_show_days"
         android:title="Tag"
         android:showAsAction="never"/>
     <item android:id="@+id/optAllValues"
         android:title="Alle"
-        android:icon=""
+        android:icon="@drawable/glyphicons_13_show_values"
         android:showAsAction="never"/>
 </menu>

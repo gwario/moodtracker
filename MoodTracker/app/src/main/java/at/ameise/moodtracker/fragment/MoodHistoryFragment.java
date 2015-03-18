@@ -16,6 +16,7 @@ import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.utils.FillFormatter;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -181,10 +182,16 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
 
             } while(data.moveToNext());
 
-            yVals.add(new LineDataSet(entries, "Mood history"));
+            LineDataSet lineData = new LineDataSet(entries, "Mood history");
+            lineData.setDrawCircles(false);
+            lineData.setDrawCubic(false);
+            lineData.setDrawFilled(true);
+            yVals.add(lineData);
         }
         Logger.info(ITag.MOOD_HISTORY, "Found " + data.getCount() + " moods");
-        lineChart.setData(new LineData(xVals, yVals));
+        LineData lineData = new LineData(xVals, yVals);
+        lineData.setDrawValues(true);
+        lineChart.setData(lineData);
         lineChart.invalidate();
     }
 
