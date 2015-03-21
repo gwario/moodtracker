@@ -1,5 +1,6 @@
 package at.ameise.moodtracker.fragment;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.Loader;
@@ -11,12 +12,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.utils.FillFormatter;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ import at.ameise.moodtracker.domain.Mood;
 import at.ameise.moodtracker.domain.MoodCursorHelper;
 import at.ameise.moodtracker.domain.MoodTableHelper;
 import at.ameise.moodtracker.util.Logger;
+import at.ameise.moodtracker.util.ShareUtil;
 
 
 /**
@@ -37,32 +39,43 @@ import at.ameise.moodtracker.util.Logger;
  */
 public class MoodHistoryFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    /**
+     * Prefix indicating the active menu item.
+     */
+    final String SELECTED_PREFIX = "> ";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    /**
+     * Parameter to specify the loader to be used initially.
+     */
+    public static final String ARG_DEFAULT_LOADER = "defaultLoader";
+
+    private int mDefaultLoader;
+
+    private Mood mMostRecentMood;
 
     private LineChart lineChart;
+
+    /**
+     * Listener to propagate events to the fragment holder.
+     */
+    private OnFragmentInteractionListener mFragmentInteractionListener;
 
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
+     * @param defaultLoader The loader to be used initially.
      * @return A new instance of fragment MoodHistoryFragment.
      */
-    // TODO: Rename and change types and number of parameters
-    public static MoodHistoryFragment newInstance(String param1, String param2) {
-        MoodHistoryFragment fragment = new MoodHistoryFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+    public static MoodHistoryFragment newInstance(int  defaultLoader) {
+
+        final MoodHistoryFragment fragment = new MoodHistoryFragment();
+        final Bundle args = new Bundle();
+
+        args.putInt(ARG_DEFAULT_LOADER, defaultLoader);
+
         fragment.setArguments(args);
+
         return fragment;
     }
 
@@ -73,9 +86,9 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            mDefaultLoader = getArguments().getInt(ARG_DEFAULT_LOADER, ILoader.MOOD_HISTORY_ALL_VALUES_LOADER);
         }
 
         setHasOptionsMenu(true);
@@ -86,7 +99,7 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
                              Bundle savedInstanceState) {
 
         //default loader
-        getLoaderManager().initLoader(ILoader.MOOD_HISTORY_ALL_VALUES_LOADER, null, this);
+        getLoaderManager().initLoader(mDefaultLoader, null, this);
 
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_mood_history, container, false);
@@ -95,31 +108,41 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
+
         inflater.inflate(R.menu.mood_history, menu);
+
+        MenuItem item = menu.findItem(R.id.menu_item_share);
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem selectedItem) {
 
-        switch (item.getItemId()) {
-            case R.id.optAllValues:
+        switch (selectedItem.getItemId()) {
+            case R.id.menu_item_history_day_values:
                 getLoaderManager().restartLoader(ILoader.MOOD_HISTORY_ALL_VALUES_LOADER, null, this);
                 return true;
 
-            case R.id.optGbDay:
+            case R.id.menu_item_history_daily_avg:
                 getLoaderManager().restartLoader(ILoader.MOOD_HISTORY_PER_DAY_LOADER, null, this);
                 return true;
 
-            case R.id.optGbWeek:
+            case R.id.menu_item_history_weekly_avg:
                 getLoaderManager().restartLoader(ILoader.MOOD_HISTORY_PER_WEEK_LOADER, null, this);
                 return true;
 
-            case R.id.optGbMonth:
+            case R.id.menu_item_history_month_avg:
                 getLoaderManager().restartLoader(ILoader.MOOD_HISTORY_PER_MONTH_LOADER, null, this);
                 return true;
 
+            case R.id.menu_item_share:
+                if(mMostRecentMood != null)
+                    ShareUtil.shareMood(getActivity(), mMostRecentMood);
+                else
+                    Toast.makeText(getActivity(), R.string.message_no_moods_yet, Toast.LENGTH_SHORT).show();
+                return true;
+
             default:
-                return super.onOptionsItemSelected(item);
+                return super.onOptionsItemSelected(selectedItem);
         }
     }
 
@@ -156,11 +179,19 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
                 throw new AssertionError("Not yet implemented! id="+id);
         }
 
+        mFragmentInteractionListener.onLoaderSet(id);
+
         return loader;
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+        if(loader.getId() == ILoader.MOOD_HISTORY_ALL_VALUES_LOADER) {
+
+            if(data.moveToLast())
+                mMostRecentMood = MoodTableHelper.fromCursor(data);
+        }
 
         final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         final ArrayList<String> xVals = new ArrayList<>();
@@ -198,5 +229,45 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        try {
+
+            mFragmentInteractionListener = (OnFragmentInteractionListener) activity;
+
+        } catch (ClassCastException e) {
+
+            throw new ClassCastException(activity.toString() + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+
+        mFragmentInteractionListener = null;
+    }
+
+    /**
+     * This interface must be implemented by activities that contain this
+     * fragment to allow an interaction in this fragment to be communicated
+     * to the activity and potentially other fragments contained in that
+     * activity.
+     * <p/>
+     * See the Android Training lesson <a href=
+     * "http://developer.android.com/training/basics/fragments/communicating.html"
+     * >Communicating with Other Fragments</a> for more information.
+     */
+    public interface OnFragmentInteractionListener {
+
+        /**
+         * The loader which is currently used.
+         * @param newLoaderId
+         */
+        void onLoaderSet(int newLoaderId);
     }
 }

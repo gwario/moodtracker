@@ -3,4 +3,23 @@
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
 
+    <string name="options_menu_day_values">All values</string>
+    <string name="options_menu_daily_avg">Day</string>
+    <string name="options_menu_weekly_avg">Week</string>
+    <string name="options_menu_monthly_avg">Month</string>
+    <string name="options_menu_share">Share</string>
+
+    <string name="share_chooser_text">Share most recent mood...</string>
+
+    <string name="message_no_moods_yet">No moods yet!</string>
+
+    <!-- used for sharing messages -->
+    <string name="share_message_subject">My mood just changed...</string><!-- this is optional-->
+    <string name="share_message_text">I\'m now in a %1$s!</string><!-- this is mandatory -->
+
+    <string name="textual_mood_very_good">very good</string>
+    <string name="textual_mood_good">good</string>
+    <string name="textual_mood_bad">bad mood</string>
+    <string name="textual_mood_very_bad">very bad mood</string>
+
 </resources>

@@ -19,7 +19,7 @@ public final class MoodCursorHelper {
 
     /**
      * @param context   the context
-     * @return a {@link CursorLoader} on all {@link at.ameise.moodtracker.domain.Mood}s.
+     * @return a {@link android.content.CursorLoader} on all {@link at.ameise.moodtracker.domain.Mood}s. Uses {@link at.ameise.moodtracker.domain.MoodTableHelper#SORT_ORDER_TIMESTAMP_ASC}.
      */
     public static Loader<Cursor> getAllMoodsCursorLoader(Context context) {
 
@@ -28,7 +28,16 @@ public final class MoodCursorHelper {
 
     /**
      * @param context   the context
-     * @return a {@link CursorLoader} on the day-average of all {@link at.ameise.moodtracker.domain.Mood}s.
+     * @return a {@link android.database.Cursor} on all {@link at.ameise.moodtracker.domain.Mood}s. Uses {@link at.ameise.moodtracker.domain.MoodTableHelper#SORT_ORDER_TIMESTAMP_ASC}.
+     */
+    public static Cursor getAllMoodsCursor(Context context) {
+
+        return context.getContentResolver().query(MoodContentProvider.CONTENT_URI_MOOD, null, null, null, MoodTableHelper.SORT_ORDER_TIMESTAMP_ASC);
+    }
+
+    /**
+     * @param context   the context
+     * @return a {@link android.content.CursorLoader} on the day-average of all {@link at.ameise.moodtracker.domain.Mood}s. Uses {@link at.ameise.moodtracker.domain.MoodTableHelper#SORT_ORDER_TIMESTAMP_ASC}.
      */
     public static Loader<Cursor> getAllMoodsAvgDayCursorLoader(Context context) {
 
@@ -37,7 +46,7 @@ public final class MoodCursorHelper {
 
     /**
      * @param context   the context
-     * @return a {@link CursorLoader} on the week-average of all {@link at.ameise.moodtracker.domain.Mood}s.
+     * @return a {@link android.content.CursorLoader} on the week-average of all {@link at.ameise.moodtracker.domain.Mood}s. Uses {@link at.ameise.moodtracker.domain.MoodTableHelper#SORT_ORDER_TIMESTAMP_ASC}.
      */
     public static Loader<Cursor> getAllMoodsAvgWeekCursorLoader(Context context) {
 
@@ -46,7 +55,7 @@ public final class MoodCursorHelper {
 
     /**
      * @param context   the context
-     * @return a {@link CursorLoader} on the month-average of all {@link at.ameise.moodtracker.domain.Mood}s.
+     * @return a {@link android.content.CursorLoader} on the month-average of all {@link at.ameise.moodtracker.domain.Mood}s. Uses {@link at.ameise.moodtracker.domain.MoodTableHelper#SORT_ORDER_TIMESTAMP_ASC}.
      */
     public static Loader<Cursor> getAllMoodsAvgMonthCursorLoader(Context context) {
 
@@ -73,7 +82,7 @@ public final class MoodCursorHelper {
     /**
      * @param context   the context
      * @param moodId    id of the mood to be loaded
-     * @return a {@link CursorLoader} on the {@link at.ameise.moodtracker.domain.Mood} with the specified id.
+     * @return a {@link android.content.CursorLoader} on the {@link at.ameise.moodtracker.domain.Mood} with the specified id.
      */
     static Loader<Cursor> getMoodCursorLoader(Context context, long moodId) {
 
@@ -83,7 +92,7 @@ public final class MoodCursorHelper {
     /**
      * @param context   the context
      * @param timestamp timestamp of the mood to be loaded
-     * @return a {@link CursorLoader} on the {@link at.ameise.moodtracker.domain.Mood} with the specified timestamp.
+     * @return a {@link android.content.CursorLoader} on the {@link at.ameise.moodtracker.domain.Mood} with the specified timestamp.
      */
     public static Loader<Cursor> getMoodCursorLoader(Context context, Calendar timestamp) {
 
@@ -94,7 +103,7 @@ public final class MoodCursorHelper {
      * @param context   the context
      * @param fromTimestamp inclusive start of the time range
      * @param toTimestamp   inclusive end of the time range
-     * @return a {@link CursorLoader} on the {@link at.ameise.moodtracker.domain.Mood}s with in the range.
+     * @return a {@link android.content.CursorLoader} on the {@link at.ameise.moodtracker.domain.Mood}s with in the range. Uses {@link at.ameise.moodtracker.domain.MoodTableHelper#SORT_ORDER_TIMESTAMP_ASC}.
      */
     public static Loader<Cursor> getMoodCursorLoader(Context context, Calendar fromTimestamp, Calendar toTimestamp) {
 
@@ -143,7 +152,7 @@ public final class MoodCursorHelper {
 
     /**
      * @param database
-     * @return a {@link android.database.Cursor} containing all the timestamps in ascending order.
+     * @return a {@link android.database.Cursor} containing all the timestamps in ascending order. Uses {@link at.ameise.moodtracker.domain.MoodTableHelper#SORT_ORDER_TIMESTAMP_ASC}.
      */
     static Cursor getAllTimestamps(SQLiteDatabase database) {
 

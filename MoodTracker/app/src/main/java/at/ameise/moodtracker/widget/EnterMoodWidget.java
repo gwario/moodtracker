@@ -6,6 +6,7 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.widget.RemoteViews;
 import android.widget.Toast;
@@ -16,7 +17,9 @@ import at.ameise.moodtracker.ITag;
 import at.ameise.moodtracker.R;
 import at.ameise.moodtracker.domain.Mood;
 import at.ameise.moodtracker.domain.MoodCursorHelper;
+import at.ameise.moodtracker.domain.MoodTableHelper;
 import at.ameise.moodtracker.util.Logger;
+import at.ameise.moodtracker.util.ShareUtil;
 
 /**
  * Implementation of App Widget functionality.
@@ -24,6 +27,7 @@ import at.ameise.moodtracker.util.Logger;
 public class EnterMoodWidget extends AppWidgetProvider {
 
     private static final String ACTION_UPDATE_CLICKED = "at.ameise.moodtracker.action.updateButtonClick";
+    private static final String ACTION_SHARE_CLICKED = "at.ameise.moodtracker.action.shareButtonClick";
     private static final String ACTION_MOOD_CLICKED_PREFIX = "at.ameise.moodtracker.action.moodButtonClick.";
 
     private static int currentMoodInt = -1;
@@ -71,8 +75,10 @@ public class EnterMoodWidget extends AppWidgetProvider {
         final ComponentName watchWidget = new ComponentName(context, EnterMoodWidget.class);
 
         remoteViews.setOnClickPendingIntent(R.id.ibUpdateCurrentMoodWidget, getPendingSelfIntent(context, ACTION_UPDATE_CLICKED, null));
+        remoteViews.setOnClickPendingIntent(R.id.ibShareCurrentMoodWidget, getPendingSelfIntent(context, ACTION_SHARE_CLICKED, null));
+
         for(int i = 0; i < MOOD_BUTTONS.length; i++)
-        remoteViews.setOnClickPendingIntent(MOOD_BUTTONS[i], getPendingSelfIntent(context, getMoodButtonAction(i), null));
+            remoteViews.setOnClickPendingIntent(MOOD_BUTTONS[i], getPendingSelfIntent(context, getMoodButtonAction(i), null));
 
         // Instruct the widget manager to update the widget
         appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
@@ -120,6 +126,24 @@ public class EnterMoodWidget extends AppWidgetProvider {
             Logger.verbose(ITag.ENTER_MOOD, "Set current mood to " + currentMoodInt);
 
             setCurrentMoodOnButtons(remoteViews, buttonIndex);
+
+        } else if (ACTION_SHARE_CLICKED.equals(intent.getAction())) {
+
+            final Cursor moodCursor = MoodCursorHelper.getAllMoodsCursor(context);
+
+            if(moodCursor.moveToLast()) {
+
+                final Mood mostRecentMood = MoodTableHelper.fromCursor(moodCursor);
+
+                ShareUtil.shareMood(context, mostRecentMood);
+
+                Logger.verbose(ITag.ENTER_MOOD, "Sharing: " + mostRecentMood.toString());
+
+            } else {
+
+                Logger.info(ITag.ENTER_MOOD, "No mood yet!");
+                Toast.makeText(context, R.string.message_no_moods_yet, Toast.LENGTH_SHORT).show();
+            }
         }
 
         appWidgetManager.updateAppWidget(thisWidget, remoteViews);
@@ -203,6 +227,7 @@ public class EnterMoodWidget extends AppWidgetProvider {
                 remoteViews.setImageViewResource(buttonResId, R.drawable.glyphicons_20_heart_empty);
         }
     }
+
 }
 
 

@@ -1,19 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/optGbMonth"
-        android:icon="@drawable/glyphicons_156_show_months"
-        android:title="Monat"
+
+    <item android:id="@+id/menu_item_share"
+        android:showAsAction="always"
+        android:title="Share"
+        android:icon="@android:drawable/ic_menu_share" />
+
+    <item android:id="@+id/menu_item_history_month_avg"
+        android:title="@string/options_menu_monthly_avg"
         android:showAsAction="never"/>
-    <item android:id="@+id/optGbWeek"
-        android:icon="@drawable/glyphicons_157_show_weeks"
-        android:title="Woche"
+    <item android:id="@+id/menu_item_history_weekly_avg"
+        android:title="@string/options_menu_weekly_avg"
         android:showAsAction="never"/>
-    <item android:id="@+id/optGbDay"
-        android:icon="@drawable/glyphicons_159_show_days"
-        android:title="Tag"
+    <item android:id="@+id/menu_item_history_daily_avg"
+        android:title="@string/options_menu_daily_avg"
         android:showAsAction="never"/>
-    <item android:id="@+id/optAllValues"
-        android:title="Alle"
-        android:icon="@drawable/glyphicons_13_show_values"
+    <item android:id="@+id/menu_item_history_day_values"
+        android:title="@string/options_menu_day_values"
         android:showAsAction="never"/>
 </menu>

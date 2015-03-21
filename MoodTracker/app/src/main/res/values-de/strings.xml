@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">MoodTracker</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
+
+    <string name="options_menu_day_values">Alle Werte</string>
+    <string name="options_menu_daily_avg">Tag</string>
+    <string name="options_menu_weekly_avg">Woche</string>
+    <string name="options_menu_monthly_avg">Monat</string>
+    <string name="options_menu_share">Teilen</string>
+
+    <string name="share_chooser_text">Aktuelle Stimmung teilen</string>
+
+    <string name="message_no_moods_yet">Noch keinen Stimmung vorhanden!</string>
+
+    <!-- used for sharing messages -->
+    <string name="share_message_subject">Meine laune hat sich gerade geändert...</string><!-- this is optional-->
+    <string name="share_message_text">Ich bin gerade %1$s!</string><!-- this is mandatory -->
+
+    <string name="textual_mood_very_good">sehr guter gelaunt</string>
+    <string name="textual_mood_good">gut gelaunt</string>
+    <string name="textual_mood_bad">schlecht gelaunt</string>
+    <string name="textual_mood_very_bad">sehr schlecht gelaunt</string>
+
+</resources>
