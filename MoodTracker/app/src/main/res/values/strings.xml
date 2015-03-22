@@ -12,6 +12,7 @@
     <string name="share_chooser_text">Share most recent mood...</string>
 
     <string name="message_no_moods_yet">No moods yet!</string>
+    <string name="message_still_loading">Data not yet loaded.</string>
 
     <!-- used for sharing messages -->
     <string name="share_message_subject">My mood just changed...</string><!-- this is optional-->
@@ -21,5 +22,6 @@
     <string name="textual_mood_good">good</string>
     <string name="textual_mood_bad">bad mood</string>
     <string name="textual_mood_very_bad">very bad mood</string>
+    <!-- /used for sharing messages -->
 
 </resources>

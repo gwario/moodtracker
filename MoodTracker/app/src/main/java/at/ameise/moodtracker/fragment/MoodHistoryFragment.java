@@ -51,9 +51,13 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
 
     private int mDisplayingLoader;
 
-    private Mood mMostRecentMood;
-
     private LineChart lineChart;
+
+    private Cursor allValuesCursor;
+    private Cursor perDayCursor;
+    private Cursor perWeekCursor;
+    private Cursor perMonthCursor;
+
     /**
      * Listener to propagate events to the fragment holder.
      */
@@ -123,35 +127,45 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
     @Override
     public boolean onOptionsItemSelected(MenuItem selectedItem) {
 
-        //TODO find a better solution to get the cursor of this loader...
-        //TODO maybe we could keep the cursors as members and only repopulate(loadercallbacks or ) the graphics on option selected
-
         switch (selectedItem.getItemId()) {
             case R.id.menu_item_history_day_values:
-                mDisplayingLoader = ILoader.MOOD_HISTORY_ALL_VALUES_LOADER;
-                getLoaderManager().restartLoader(ILoader.MOOD_HISTORY_ALL_VALUES_LOADER, null, this);
+                if(mDisplayingLoader != ILoader.MOOD_HISTORY_ALL_VALUES_LOADER) {
+                    mDisplayingLoader = ILoader.MOOD_HISTORY_ALL_VALUES_LOADER;
+                    repopulateChart(allValuesCursor);
+                }
                 return true;
 
             case R.id.menu_item_history_daily_avg:
-                mDisplayingLoader = ILoader.MOOD_HISTORY_PER_DAY_LOADER;
-                getLoaderManager().restartLoader(ILoader.MOOD_HISTORY_PER_DAY_LOADER, null, this);
+                if(mDisplayingLoader != ILoader.MOOD_HISTORY_PER_DAY_LOADER) {
+                    mDisplayingLoader = ILoader.MOOD_HISTORY_PER_DAY_LOADER;
+                    repopulateChart(perDayCursor);
+
+                }
                 return true;
 
             case R.id.menu_item_history_weekly_avg:
-                mDisplayingLoader = ILoader.MOOD_HISTORY_PER_WEEK_LOADER;
-                getLoaderManager().restartLoader(ILoader.MOOD_HISTORY_PER_WEEK_LOADER, null, this);
+                if(mDisplayingLoader != ILoader.MOOD_HISTORY_PER_WEEK_LOADER) {
+                    mDisplayingLoader = ILoader.MOOD_HISTORY_PER_WEEK_LOADER;
+                    repopulateChart(perWeekCursor);
+                }
                 return true;
 
             case R.id.menu_item_history_month_avg:
-                mDisplayingLoader = ILoader.MOOD_HISTORY_PER_MONTH_LOADER;
-                getLoaderManager().restartLoader(ILoader.MOOD_HISTORY_PER_MONTH_LOADER, null, this);
+                if(mDisplayingLoader != ILoader.MOOD_HISTORY_PER_MONTH_LOADER) {
+                    mDisplayingLoader = ILoader.MOOD_HISTORY_PER_MONTH_LOADER;
+                    repopulateChart(perMonthCursor);
+                }
                 return true;
 
             case R.id.menu_item_share:
-                if(mMostRecentMood != null)
-                    ShareUtil.shareMood(getActivity(), mMostRecentMood);
-                else
-                    Toast.makeText(getActivity(), R.string.message_no_moods_yet, Toast.LENGTH_SHORT).show();
+                if(allValuesCursor != null) {
+                    if (allValuesCursor.moveToLast())
+                        ShareUtil.shareMood(getActivity(), MoodTableHelper.fromCursor(allValuesCursor));
+                    else
+                        Toast.makeText(getActivity(), R.string.message_no_moods_yet, Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getActivity(), R.string.message_still_loading, Toast.LENGTH_SHORT).show();
+                }
                 return true;
 
             default:
@@ -164,6 +178,46 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
         super.onViewCreated(view, savedInstanceState);
 
         lineChart = (LineChart) view.findViewById(R.id.lcMoodHistory);
+    }
+
+    /**
+     * Repopulates the chart with the values of the specified {@link android.database.Cursor}.
+     * This method should be called after new data was loaded by the cursor providing loader.
+     * @param data
+     */
+    private void repopulateChart(Cursor data) {
+
+        final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        final ArrayList<String> xVals = new ArrayList<>();
+        final ArrayList<LineDataSet> yVals = new ArrayList<>();
+
+        if (data.moveToFirst()) {
+
+            ArrayList<Entry> entries = new ArrayList<>();
+            int index = 0;
+
+            Mood mood = null;
+
+            do {
+
+                mood = MoodTableHelper.fromCursor(data);
+                entries.add(index, new Entry(mood.getMood(), index));
+                xVals.add(dateFormat.format(mood.getDate().getTime()));
+                index++;
+
+            } while (data.moveToNext());
+
+            LineDataSet lineData = new LineDataSet(entries, "Mood history");
+            lineData.setDrawCircles(false);
+            lineData.setDrawCubic(false);
+            lineData.setDrawFilled(true);
+            yVals.add(lineData);
+        }
+        Logger.info(ITag.MOOD_HISTORY, "Found " + data.getCount() + " moods");
+        LineData lineData = new LineData(xVals, yVals);
+        lineData.setDrawValues(true);
+        lineChart.setData(lineData);
+        lineChart.invalidate();
     }
 
     @Override
@@ -200,52 +254,40 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
 
         if(loader.getId() == ILoader.MOOD_HISTORY_ALL_VALUES_LOADER) {
 
-            if(data.moveToLast())
-                mMostRecentMood = MoodTableHelper.fromCursor(data);
+            allValuesCursor = data;
+
+        } else if(loader.getId() == ILoader.MOOD_HISTORY_PER_DAY_LOADER) {
+
+            perDayCursor = data;
+
+        } else if(loader.getId() == ILoader.MOOD_HISTORY_PER_WEEK_LOADER) {
+
+            perWeekCursor = data;
+
+        } else if(loader.getId() == ILoader.MOOD_HISTORY_PER_MONTH_LOADER) {
+
+            perMonthCursor = data;
         }
 
-        //TODO keep cursor instance as member
-        //TODO if it is the displaying cursor, repopulate the graphics
 
         if(loader.getId() == mDisplayingLoader) {
 
-            final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            final ArrayList<String> xVals = new ArrayList<>();
-            final ArrayList<LineDataSet> yVals = new ArrayList<>();
-
-            if (data.moveToFirst()) {
-
-                ArrayList<Entry> entries = new ArrayList<>();
-                int index = 0;
-
-                Mood mood = null;
-
-                do {
-
-                    mood = MoodTableHelper.fromCursor(data);
-                    entries.add(index, new Entry(mood.getMood(), index));
-                    xVals.add(dateFormat.format(mood.getDate().getTime()));
-                    index++;
-
-                } while (data.moveToNext());
-
-                LineDataSet lineData = new LineDataSet(entries, "Mood history");
-                lineData.setDrawCircles(false);
-                lineData.setDrawCubic(false);
-                lineData.setDrawFilled(true);
-                yVals.add(lineData);
-            }
-            Logger.info(ITag.MOOD_HISTORY, "Found " + data.getCount() + " moods");
-            LineData lineData = new LineData(xVals, yVals);
-            lineData.setDrawValues(true);
-            lineChart.setData(lineData);
-            lineChart.invalidate();
+            repopulateChart(data);
         }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        //TODO remove the reference to the cursor
+
+        //remove ref to cursor since it was closed with the loader...
+        if(loader.getId() == ILoader.MOOD_HISTORY_ALL_VALUES_LOADER)
+            allValuesCursor = null;
+        if(loader.getId() == ILoader.MOOD_HISTORY_PER_DAY_LOADER)
+            perDayCursor = null;
+        if(loader.getId() == ILoader.MOOD_HISTORY_PER_WEEK_LOADER)
+            perWeekCursor = null;
+        if(loader.getId() == ILoader.MOOD_HISTORY_PER_MONTH_LOADER)
+            perMonthCursor = null;
     }
 
     @Override

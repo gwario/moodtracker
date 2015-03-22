@@ -12,6 +12,7 @@
     <string name="share_chooser_text">Aktuelle Stimmung teilen</string>
 
     <string name="message_no_moods_yet">Noch keinen Stimmung vorhanden!</string>
+    <string name="message_still_loading">Daten noch nicht geladen.</string>
 
     <!-- used for sharing messages -->
     <string name="share_message_subject">Meine laune hat sich gerade geändert...</string><!-- this is optional-->
@@ -21,5 +22,6 @@
     <string name="textual_mood_good">gut gelaunt</string>
     <string name="textual_mood_bad">schlecht gelaunt</string>
     <string name="textual_mood_very_bad">sehr schlecht gelaunt</string>
+    <!-- /used for sharing messages -->
 
 </resources>
