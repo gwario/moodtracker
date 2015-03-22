@@ -17,7 +17,7 @@
     <string name="share_message_subject">Meine laune hat sich gerade geändert...</string><!-- this is optional-->
     <string name="share_message_text">Ich bin gerade %1$s!</string><!-- this is mandatory -->
 
-    <string name="textual_mood_very_good">sehr guter gelaunt</string>
+    <string name="textual_mood_very_good">sehr gut gelaunt</string>
     <string name="textual_mood_good">gut gelaunt</string>
     <string name="textual_mood_bad">schlecht gelaunt</string>
     <string name="textual_mood_very_bad">sehr schlecht gelaunt</string>

@@ -47,14 +47,13 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
     /**
      * Parameter to specify the loader to be used initially.
      */
-    public static final String ARG_DEFAULT_LOADER = "defaultLoader";
+    public static final String ARG_INITIAL_LOADER = "initialLoader";
 
-    private int mDefaultLoader;
+    private int mDisplayingLoader;
 
     private Mood mMostRecentMood;
 
     private LineChart lineChart;
-
     /**
      * Listener to propagate events to the fragment holder.
      */
@@ -72,7 +71,7 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
         final MoodHistoryFragment fragment = new MoodHistoryFragment();
         final Bundle args = new Bundle();
 
-        args.putInt(ARG_DEFAULT_LOADER, defaultLoader);
+        args.putInt(ARG_INITIAL_LOADER, defaultLoader);
 
         fragment.setArguments(args);
 
@@ -88,8 +87,12 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
-            mDefaultLoader = getArguments().getInt(ARG_DEFAULT_LOADER, ILoader.MOOD_HISTORY_ALL_VALUES_LOADER);
+            mDisplayingLoader = getArguments().getInt(ARG_INITIAL_LOADER, ILoader.MOOD_HISTORY_ALL_VALUES_LOADER);
         }
+        //TODO either create all loaders at first and only populate graphic with the current or only keep one loader at a time and destroy the old if a new one is required
+        //TODO since we want to have all values loader too, we should consider it a performance issue to keep this loader....
+        //TODO so it maybe better to keep only on loader! But we need the all values loader for the mostRecentMood... so we need it anyway...
+        //TODO so we keep all loaders.... :-(
 
         setHasOptionsMenu(true);
     }
@@ -98,8 +101,11 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        //default loader
-        getLoaderManager().initLoader(mDefaultLoader, null, this);
+        //init loaders
+        getLoaderManager().initLoader(ILoader.MOOD_HISTORY_ALL_VALUES_LOADER, null, this);
+        getLoaderManager().initLoader(ILoader.MOOD_HISTORY_PER_DAY_LOADER, null, this);
+        getLoaderManager().initLoader(ILoader.MOOD_HISTORY_PER_WEEK_LOADER, null, this);
+        getLoaderManager().initLoader(ILoader.MOOD_HISTORY_PER_MONTH_LOADER, null, this);
 
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_mood_history, container, false);
@@ -117,20 +123,27 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
     @Override
     public boolean onOptionsItemSelected(MenuItem selectedItem) {
 
+        //TODO find a better solution to get the cursor of this loader...
+        //TODO maybe we could keep the cursors as members and only repopulate(loadercallbacks or ) the graphics on option selected
+
         switch (selectedItem.getItemId()) {
             case R.id.menu_item_history_day_values:
+                mDisplayingLoader = ILoader.MOOD_HISTORY_ALL_VALUES_LOADER;
                 getLoaderManager().restartLoader(ILoader.MOOD_HISTORY_ALL_VALUES_LOADER, null, this);
                 return true;
 
             case R.id.menu_item_history_daily_avg:
+                mDisplayingLoader = ILoader.MOOD_HISTORY_PER_DAY_LOADER;
                 getLoaderManager().restartLoader(ILoader.MOOD_HISTORY_PER_DAY_LOADER, null, this);
                 return true;
 
             case R.id.menu_item_history_weekly_avg:
+                mDisplayingLoader = ILoader.MOOD_HISTORY_PER_WEEK_LOADER;
                 getLoaderManager().restartLoader(ILoader.MOOD_HISTORY_PER_WEEK_LOADER, null, this);
                 return true;
 
             case R.id.menu_item_history_month_avg:
+                mDisplayingLoader = ILoader.MOOD_HISTORY_PER_MONTH_LOADER;
                 getLoaderManager().restartLoader(ILoader.MOOD_HISTORY_PER_MONTH_LOADER, null, this);
                 return true;
 
@@ -179,8 +192,6 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
                 throw new AssertionError("Not yet implemented! id="+id);
         }
 
-        mFragmentInteractionListener.onLoaderSet(id);
-
         return loader;
     }
 
@@ -193,42 +204,48 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
                 mMostRecentMood = MoodTableHelper.fromCursor(data);
         }
 
-        final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        final ArrayList<String> xVals = new ArrayList<>();
-        final ArrayList<LineDataSet> yVals = new ArrayList<>();
+        //TODO keep cursor instance as member
+        //TODO if it is the displaying cursor, repopulate the graphics
 
-        if(data.moveToFirst()) {
+        if(loader.getId() == mDisplayingLoader) {
 
-            ArrayList<Entry> entries = new ArrayList<>();
-            int index = 0;
+            final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            final ArrayList<String> xVals = new ArrayList<>();
+            final ArrayList<LineDataSet> yVals = new ArrayList<>();
 
-            Mood mood = null;
+            if (data.moveToFirst()) {
 
-            do {
+                ArrayList<Entry> entries = new ArrayList<>();
+                int index = 0;
 
-                mood = MoodTableHelper.fromCursor(data);
-                entries.add(index, new Entry(mood.getMood(), index));
-                xVals.add(dateFormat.format(mood.getDate().getTime()));
-                index++;
+                Mood mood = null;
 
-            } while(data.moveToNext());
+                do {
 
-            LineDataSet lineData = new LineDataSet(entries, "Mood history");
-            lineData.setDrawCircles(false);
-            lineData.setDrawCubic(false);
-            lineData.setDrawFilled(true);
-            yVals.add(lineData);
+                    mood = MoodTableHelper.fromCursor(data);
+                    entries.add(index, new Entry(mood.getMood(), index));
+                    xVals.add(dateFormat.format(mood.getDate().getTime()));
+                    index++;
+
+                } while (data.moveToNext());
+
+                LineDataSet lineData = new LineDataSet(entries, "Mood history");
+                lineData.setDrawCircles(false);
+                lineData.setDrawCubic(false);
+                lineData.setDrawFilled(true);
+                yVals.add(lineData);
+            }
+            Logger.info(ITag.MOOD_HISTORY, "Found " + data.getCount() + " moods");
+            LineData lineData = new LineData(xVals, yVals);
+            lineData.setDrawValues(true);
+            lineChart.setData(lineData);
+            lineChart.invalidate();
         }
-        Logger.info(ITag.MOOD_HISTORY, "Found " + data.getCount() + " moods");
-        LineData lineData = new LineData(xVals, yVals);
-        lineData.setDrawValues(true);
-        lineChart.setData(lineData);
-        lineChart.invalidate();
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-
+        //TODO remove the reference to the cursor
     }
 
     @Override
@@ -264,10 +281,5 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
      */
     public interface OnFragmentInteractionListener {
 
-        /**
-         * The loader which is currently used.
-         * @param newLoaderId
-         */
-        void onLoaderSet(int newLoaderId);
     }
 }
