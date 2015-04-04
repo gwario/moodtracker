@@ -10,12 +10,31 @@ public class Mood {
     private Long id;
     private float mood;
     private Calendar date;
+    private MoodTableHelper.EMoodScope scope;
+
+    /**
+     * Sets the default scope {@link at.ameise.moodtracker.domain.MoodTableHelper.EMoodScope#RAW} and the current time.
+     */
+    public Mood(float mood) {
+
+        this.mood = mood;
+        this.date = Calendar.getInstance();
+        this.scope = MoodTableHelper.EMoodScope.RAW;
+    }
+
+    /**
+     * For creation from database values.
+     * This constructor does not set any fields.
+     */
+    Mood() {
+    }
 
     @Override
     public String toString() {
         return "Mood {" +
                 "mood=" + mood + ", " +
-                "date=" + date +
+                "date=" + date + ", " +
+                "scope=" + scope +
                 '}';
     }
 
@@ -23,7 +42,19 @@ public class Mood {
         return date;
     }
 
-    public void setDate(Calendar date) {
+    public long getDateInSeconds() {
+        return date.getTimeInMillis() / 1000;
+    }
+
+    void setDate(long seconds) {
+
+        final Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(seconds * 1000);
+
+        this.date = c;
+    }
+
+    void setDate(Calendar date) {
         this.date = date;
     }
 
@@ -32,7 +63,7 @@ public class Mood {
         return mood;
     }
 
-    public void setMood(float mood) {
+    void setMood(float mood) {
         this.mood = mood;
     }
 
@@ -40,8 +71,15 @@ public class Mood {
         return id;
     }
 
-    public void setId(long id) {
+    void setId(long id) {
         this.id = id;
     }
 
+    public MoodTableHelper.EMoodScope getScope() {
+        return scope;
+    }
+
+    void setScope(MoodTableHelper.EMoodScope scope) {
+        this.scope = scope;
+    }
 }

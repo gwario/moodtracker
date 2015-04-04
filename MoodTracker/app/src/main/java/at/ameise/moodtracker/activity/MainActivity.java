@@ -1,21 +1,19 @@
 package at.ameise.moodtracker.activity;
 
+import android.app.Activity;
+import android.os.Bundle;
+
 import at.ameise.moodtracker.R;
 import at.ameise.moodtracker.domain.Mood;
 import at.ameise.moodtracker.fragment.EnterMoodFragment;
 import at.ameise.moodtracker.fragment.MoodHistoryFragment;
-import at.ameise.moodtracker.util.Logger;
-import at.ameise.moodtracker.widget.EnterMoodWidget;
-
-import android.app.Activity;
-import android.os.Bundle;
 
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class MainActivity extends Activity implements EnterMoodFragment.OnFragmentInteractionListener, MoodHistoryFragment.OnFragmentInteractionListener {
+public class MainActivity extends Activity implements EnterMoodFragment.OnFragmentInteractionListener {
 
     private MoodHistoryFragment moodHistoryFragment;
 

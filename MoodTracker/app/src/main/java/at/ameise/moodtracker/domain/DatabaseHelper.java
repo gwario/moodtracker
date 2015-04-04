@@ -8,6 +8,8 @@ import at.ameise.moodtracker.ITag;
 import at.ameise.moodtracker.util.Logger;
 
 /**
+ * Contains methods to create, delete or upgrade the database.
+ *
  * Created by Mario Gastegger <mario DOT gastegger AT gmail DOT com> on 14.02.15.
  */
 public class DatabaseHelper extends SQLiteOpenHelper {
@@ -15,7 +17,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "mood.db";
 
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
 
     private static DatabaseHelper INSTANCE = null;
@@ -28,7 +30,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param context
      * @return a singleton instance of {@link DatabaseHelper}.
      */
-    public static final DatabaseHelper getInstance(Context context) {
+    public static DatabaseHelper getInstance(Context context) {
 
         if (INSTANCE == null)
             INSTANCE = new DatabaseHelper(context);
@@ -51,13 +53,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
-        if(oldVersion == 1) {
+        Logger.info(ITag.DATABASE, "Upgrading mood table from version "+oldVersion+" to version "+newVersion);
 
-            Logger.info(ITag.DATABASE, "Upgrading mood table from version 1");
+        if(oldVersion <= 1) {
+
             changeMoodTypeToReal(db);
         }
+
+        if(oldVersion <= 2) {
+
+            addScopeColumn(db);
+        }
+
         //onDrop(db);
         //onCreate(db);
+    }
+
+    /**
+     * Adds a new column to the mood table to allow
+     * @param db
+     */
+    private void addScopeColumn(SQLiteDatabase db) {
+
+        db.execSQL("ALTER TABLE "+MoodTableHelper.TABLE_NAME+" ADD COLUMN "+MoodTableHelper.COL_SCOPE+" NOT NULL DEFAULT 'RAW'");
     }
 
     /**
@@ -79,7 +97,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(createRenameStatement(MIGRATION_TABLE, MoodTableHelper.TABLE_NAME));
     }
 
-    private static final String createRenameStatement(String fromTableName, String toTableName) {
+    private static String createRenameStatement(String fromTableName, String toTableName) {
 
         return "ALTER TABLE "+fromTableName+" RENAME TO "+toTableName;
     }
@@ -88,7 +106,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param tableName
      * @return a drop statement for the specified table name.
      */
-    private static final String createDropStatement(String tableName) {
+    private static String createDropStatement(String tableName) {
 
         return "DROP TABLE "+tableName;
     }

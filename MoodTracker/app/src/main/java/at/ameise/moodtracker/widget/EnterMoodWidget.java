@@ -11,8 +11,6 @@ import android.os.Bundle;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
-import java.util.Calendar;
-
 import at.ameise.moodtracker.ITag;
 import at.ameise.moodtracker.R;
 import at.ameise.moodtracker.domain.Mood;
@@ -42,12 +40,19 @@ public class EnterMoodWidget extends AppWidgetProvider {
         R.id.ibCurrentMoodWidget6,
     };
 
+    private RemoteViews remoteViews;
+    private ComponentName thisWidget;
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+
+        if(remoteViews == null)
+            remoteViews = new RemoteViews(context.getPackageName(), R.layout.enter_mood_widget);
+        if(thisWidget == null)
+            thisWidget = new ComponentName(context, EnterMoodWidget.class);
+
         // There may be multiple widgets active, so update all of them
-        final int N = appWidgetIds.length;
-        for (int i = 0; i < N; i++) {
+        for (int i = 0; i < appWidgetIds.length; i++) {
             updateAppWidget(context, appWidgetManager, appWidgetIds[i]);
         }
     }
@@ -68,17 +73,14 @@ public class EnterMoodWidget extends AppWidgetProvider {
      * @param appWidgetManager
      * @param appWidgetId
      */
-    private static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
-                                int appWidgetId) {
-
-        final RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.enter_mood_widget);
-        final ComponentName watchWidget = new ComponentName(context, EnterMoodWidget.class);
+    private void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
 
         remoteViews.setOnClickPendingIntent(R.id.ibUpdateCurrentMoodWidget, getPendingSelfIntent(context, ACTION_UPDATE_CLICKED, null));
         remoteViews.setOnClickPendingIntent(R.id.ibShareCurrentMoodWidget, getPendingSelfIntent(context, ACTION_SHARE_CLICKED, null));
 
-        for(int i = 0; i < MOOD_BUTTONS.length; i++)
+        for(int i = 0; i < MOOD_BUTTONS.length; i++) {
             remoteViews.setOnClickPendingIntent(MOOD_BUTTONS[i], getPendingSelfIntent(context, getMoodButtonAction(i), null));
+        }
 
         // Instruct the widget manager to update the widget
         appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
@@ -99,17 +101,17 @@ public class EnterMoodWidget extends AppWidgetProvider {
 
         final AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
 
-        final RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.enter_mood_widget);
-        final ComponentName thisWidget = new ComponentName(context, EnterMoodWidget.class);
+        if(remoteViews == null)
+            remoteViews = new RemoteViews(context.getPackageName(), R.layout.enter_mood_widget);
+        if(thisWidget == null)
+            thisWidget = new ComponentName(context, EnterMoodWidget.class);
 
         Logger.debug(ITag.ENTER_MOOD, "Intent: " + intent);
         Logger.debug(ITag.ENTER_MOOD, "Extras: " + intent.getExtras());
 
         if (ACTION_UPDATE_CLICKED.equals(intent.getAction())) {
 
-            final Mood currentMood = new Mood();
-            currentMood.setDate(Calendar.getInstance());
-            currentMood.setMood(getCurrentMood(context));
+            final Mood currentMood = new Mood(getCurrentMood(context));
             MoodCursorHelper.createMood(context, currentMood);
 
             Logger.verbose(ITag.ENTER_MOOD, "Created: " + currentMood.toString());
@@ -203,7 +205,7 @@ public class EnterMoodWidget extends AppWidgetProvider {
      * Updates the state of the buttons to the default mood.
      * @param remoteViews
      */
-    private static final void setDefaultMoodOnButtons(Context context, RemoteViews remoteViews) {
+    private static void setDefaultMoodOnButtons(Context context, RemoteViews remoteViews) {
 
         final int buttonIndex = context.getResources().getInteger(R.integer.default_mood) - 1;
 
@@ -215,7 +217,7 @@ public class EnterMoodWidget extends AppWidgetProvider {
      * @param remoteViews
      * @param buttonIndex
      */
-    private static final void setCurrentMoodOnButtons(RemoteViews remoteViews, int buttonIndex) {
+    private static void setCurrentMoodOnButtons(RemoteViews remoteViews, int buttonIndex) {
 
         for(int i = 0; i < MOOD_BUTTONS.length; i++) {
 

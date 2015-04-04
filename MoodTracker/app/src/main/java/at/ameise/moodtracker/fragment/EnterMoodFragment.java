@@ -13,8 +13,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.Calendar;
-
 import at.ameise.moodtracker.ITag;
 import at.ameise.moodtracker.R;
 import at.ameise.moodtracker.domain.Mood;
@@ -35,8 +33,6 @@ public class EnterMoodFragment extends Fragment implements SeekBar.OnSeekBarChan
     private TextView tvCurrentMood;
     private Button bUpdateCurrentMood;
     private GestureDetector mCurrentMoodDoubleTapGestureDetector;
-
-    private int maxMood;
 
     /**
      * Listener to propagate events to the fragment holder.
@@ -66,9 +62,6 @@ public class EnterMoodFragment extends Fragment implements SeekBar.OnSeekBarChan
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            //set args
-        }
 
         mCurrentMoodDoubleTapGestureDetector = new GestureDetector(this.getActivity(), new GestureDetector.SimpleOnGestureListener() {
             @Override
@@ -126,7 +119,7 @@ public class EnterMoodFragment extends Fragment implements SeekBar.OnSeekBarChan
 
         if(v.getId() == R.id.bUpdateCurrentMood) {
 
-            final Mood currentMood = createMoodFromInput();
+            final Mood currentMood = new Mood(getMoodFromSeekbar());
 
             MoodCursorHelper.createMood(getActivity(), currentMood);
 
@@ -135,16 +128,6 @@ public class EnterMoodFragment extends Fragment implements SeekBar.OnSeekBarChan
 
             mFragmentInteractionListener.onMoodUpdate(currentMood);
         }
-    }
-
-    private Mood createMoodFromInput() {
-
-        final Mood mood = new Mood();
-
-        mood.setDate(Calendar.getInstance());
-        mood.setMood(getMoodFromSeekbar());
-
-        return mood;
     }
 
     @Override
@@ -159,7 +142,7 @@ public class EnterMoodFragment extends Fragment implements SeekBar.OnSeekBarChan
     /**
      * @return The actual mood. This is the scale corrected value of the progress of the seek bar.
      */
-    private final int getMoodFromSeekbar() {
+    private int getMoodFromSeekbar() {
 
         return sbCurrentMood.getProgress() + 1;
     }
@@ -198,7 +181,7 @@ public class EnterMoodFragment extends Fragment implements SeekBar.OnSeekBarChan
 
         /**
          * Called when the mood has been updated.
-         * @param currentMood
+         * @param currentMood the mood which was just set.
          */
         void onMoodUpdate(Mood currentMood);
     }

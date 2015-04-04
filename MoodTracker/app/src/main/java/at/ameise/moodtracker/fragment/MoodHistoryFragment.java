@@ -1,6 +1,5 @@
 package at.ameise.moodtracker.fragment;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.Loader;
@@ -19,6 +18,7 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
@@ -40,11 +40,6 @@ import at.ameise.moodtracker.util.ShareUtil;
 public class MoodHistoryFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     /**
-     * Prefix indicating the active menu item.
-     */
-    final String SELECTED_PREFIX = "> ";
-
-    /**
      * Parameter to specify the loader to be used initially.
      */
     public static final String ARG_INITIAL_LOADER = "initialLoader";
@@ -57,11 +52,6 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
     private Cursor perDayCursor;
     private Cursor perWeekCursor;
     private Cursor perMonthCursor;
-
-    /**
-     * Listener to propagate events to the fragment holder.
-     */
-    private OnFragmentInteractionListener mFragmentInteractionListener;
 
     /**
      * Use this factory method to create a new instance of
@@ -91,7 +81,12 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
+
             mDisplayingLoader = getArguments().getInt(ARG_INITIAL_LOADER, ILoader.MOOD_HISTORY_ALL_VALUES_LOADER);
+
+        } else {
+
+            mDisplayingLoader = ILoader.MOOD_HISTORY_ALL_VALUES_LOADER;
         }
         //TODO either create all loaders at first and only populate graphic with the current or only keep one loader at a time and destroy the old if a new one is required
         //TODO since we want to have all values loader too, we should consider it a performance issue to keep this loader....
@@ -120,8 +115,6 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
         super.onCreateOptionsMenu(menu, inflater);
 
         inflater.inflate(R.menu.mood_history, menu);
-
-        MenuItem item = menu.findItem(R.id.menu_item_share);
     }
 
     @Override
@@ -178,16 +171,21 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
         super.onViewCreated(view, savedInstanceState);
 
         lineChart = (LineChart) view.findViewById(R.id.lcMoodHistory);
+
+        lineChart.setNoDataText("No data!");
+        lineChart.setNoDataTextDescription("No data why: ...");
+        lineChart.setDescription("");
     }
 
     /**
      * Repopulates the chart with the values of the specified {@link android.database.Cursor}.
      * This method should be called after new data was loaded by the cursor providing loader.
-     * @param data
+     * @param data the cursor containing moods.
      */
     private void repopulateChart(Cursor data) {
 
-        final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        final DecimalFormat twoDForm = new DecimalFormat("#,##");
+        final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", getResources().getConfiguration().locale);
         final ArrayList<String> xVals = new ArrayList<>();
         final ArrayList<LineDataSet> yVals = new ArrayList<>();
 
@@ -196,19 +194,19 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
             ArrayList<Entry> entries = new ArrayList<>();
             int index = 0;
 
-            Mood mood = null;
+            Mood mood;
 
             do {
 
                 mood = MoodTableHelper.fromCursor(data);
-                entries.add(index, new Entry(mood.getMood(), index));
+                entries.add(index, new Entry(Float.parseFloat(twoDForm.format(mood.getMood())), index));
                 xVals.add(dateFormat.format(mood.getDate().getTime()));
                 index++;
 
             } while (data.moveToNext());
 
             LineDataSet lineData = new LineDataSet(entries, "Mood history");
-            lineData.setDrawCircles(false);
+            lineData.setDrawCircles(true);
             lineData.setDrawCubic(false);
             lineData.setDrawFilled(true);
             yVals.add(lineData);
@@ -216,8 +214,36 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
         Logger.info(ITag.MOOD_HISTORY, "Found " + data.getCount() + " moods");
         LineData lineData = new LineData(xVals, yVals);
         lineData.setDrawValues(true);
+
         lineChart.setData(lineData);
+
+        if(mDisplayingLoader == ILoader.MOOD_HISTORY_ALL_VALUES_LOADER) {
+
+            lineChart.setVisibleXRange(16);
+            lineChart.moveViewToX(lineData.getXValCount()-17);
+//                lineChart.setMaxVisibleValueCount(16); after 16 values, the values wont be drawn anymore...
+
+        } else if(mDisplayingLoader == ILoader.MOOD_HISTORY_PER_DAY_LOADER) {
+
+            lineChart.setVisibleXRange(7);
+            lineChart.moveViewToX(lineData.getXValCount()-8);
+//                lineChart.setMaxVisibleValueCount(16);
+
+        } else if(mDisplayingLoader == ILoader.MOOD_HISTORY_PER_WEEK_LOADER) {
+
+            lineChart.setVisibleXRange(4);
+            lineChart.moveViewToX(lineData.getXValCount()-5);
+//                lineChart.setMaxVisibleValueCount(16);
+
+        } else if(mDisplayingLoader == ILoader.MOOD_HISTORY_PER_MONTH_LOADER) {
+
+            lineChart.setVisibleXRange(4);
+            lineChart.moveViewToX(lineData.getXValCount()-5);
+//                lineChart.setMaxVisibleValueCount(16);
+        }
+
         lineChart.invalidate();
+        lineChart.getLegend().setEnabled(false);
     }
 
     @Override
@@ -290,38 +316,4 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
             perMonthCursor = null;
     }
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-
-        try {
-
-            mFragmentInteractionListener = (OnFragmentInteractionListener) activity;
-
-        } catch (ClassCastException e) {
-
-            throw new ClassCastException(activity.toString() + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-
-        mFragmentInteractionListener = null;
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-
-    }
 }

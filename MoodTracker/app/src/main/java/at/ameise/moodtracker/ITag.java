@@ -13,4 +13,5 @@ public interface ITag {
     static final String MOOD_PROVIDER = "MoodProvider";
 
     static final String DATABASE = "Database";
+    static final String INITIALIZATION = "Initialization";
 }

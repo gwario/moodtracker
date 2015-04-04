@@ -7,5 +7,5 @@ package at.ameise.moodtracker;
  */
 public interface ISetting {
 
-    boolean LOG_MODE_DEBUG = false;
+    boolean LOG_MODE_DEBUG = true;
 }
