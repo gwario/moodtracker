@@ -78,7 +78,7 @@ public class AverageCalculatorHelper {
                 if(averageMood != null) {
 
                     mood = new Mood();
-                    mood.setScope(MoodTableHelper.EMoodScope.WEEK);
+                    mood.setScope(MoodTableHelper.EMoodScope.MONTH);
                     mood.setDate(startDate);
                     mood.setMood(averageMood);
 

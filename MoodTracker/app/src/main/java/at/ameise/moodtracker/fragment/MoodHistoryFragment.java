@@ -23,11 +23,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import at.ameise.moodtracker.ILoader;
+import at.ameise.moodtracker.ISetting;
 import at.ameise.moodtracker.ITag;
 import at.ameise.moodtracker.R;
 import at.ameise.moodtracker.domain.Mood;
 import at.ameise.moodtracker.domain.MoodCursorHelper;
 import at.ameise.moodtracker.domain.MoodTableHelper;
+import at.ameise.moodtracker.service.AverageCalculatorService;
 import at.ameise.moodtracker.util.Logger;
 import at.ameise.moodtracker.util.ShareUtil;
 
@@ -119,6 +121,19 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
         super.onCreateOptionsMenu(menu, inflater);
 
         inflater.inflate(R.menu.mood_history, menu);
+
+        if(ISetting.APP_MODE_DEBUG) {
+
+            MenuItem item = menu.add("Run avg Calc");
+            item.setOnMenuItemClickListener (new MenuItem.OnMenuItemClickListener(){
+                @Override
+                public boolean onMenuItemClick (MenuItem item){
+
+                    AverageCalculatorService.startActionCalculateAverage(getActivity(), new MoodTableHelper.EMoodScope[]{ MoodTableHelper.EMoodScope.QUARTER_DAY, MoodTableHelper.EMoodScope.DAY, MoodTableHelper.EMoodScope.WEEK, MoodTableHelper.EMoodScope.MONTH });
+                    return true;
+                }
+            });
+        }
     }
 
     @Override
