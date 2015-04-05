@@ -17,6 +17,7 @@ import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.utils.ValueFormatter;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -259,6 +260,13 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
 //        }
         lineChart.invalidate();
 
+        lineChart.getAxisLeft().setAxisMinValue(0.5f);
+        lineChart.getAxisLeft().setAxisMaxValue(7.5f);
+        lineChart.getAxisLeft().setValueFormatter(new DefaultValueFormatter());
+        lineChart.getAxisRight().setAxisMinValue(0.5f);
+        lineChart.getAxisRight().setAxisMaxValue(7.5f);
+        lineChart.getAxisRight().setValueFormatter(new DefaultValueFormatter());
+        lineChart.getLineData().setValueFormatter(new DefaultValueFormatter());
         lineChart.setMaxVisibleValueCount(18);//hide value labels after 18 values in viewport
         lineChart.getLegend().setEnabled(false);
     }
