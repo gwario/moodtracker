@@ -39,6 +39,8 @@ import at.ameise.moodtracker.util.ShareUtil;
  */
 public class MoodHistoryFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
+    public SimpleDateFormat simpleDateFormat;
+
     /**
      * Parameter to specify the loader to be used initially.
      */
@@ -48,7 +50,7 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
 
     private LineChart lineChart;
 
-    private Cursor allValuesCursor;
+    private Cursor perQuarterDayCursor;
     private Cursor perDayCursor;
     private Cursor perWeekCursor;
     private Cursor perMonthCursor;
@@ -80,13 +82,15 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd", getResources().getConfiguration().locale);
+
         if (getArguments() != null) {
 
-            mDisplayingLoader = getArguments().getInt(ARG_INITIAL_LOADER, ILoader.MOOD_HISTORY_ALL_VALUES_LOADER);
+            mDisplayingLoader = getArguments().getInt(ARG_INITIAL_LOADER, ILoader.MOOD_HISTORY_PER_QUARTER_DAY_LOADER);
 
         } else {
 
-            mDisplayingLoader = ILoader.MOOD_HISTORY_ALL_VALUES_LOADER;
+            mDisplayingLoader = ILoader.MOOD_HISTORY_PER_QUARTER_DAY_LOADER;
         }
         //TODO either create all loaders at first and only populate graphic with the current or only keep one loader at a time and destroy the old if a new one is required
         //TODO since we want to have all values loader too, we should consider it a performance issue to keep this loader....
@@ -101,7 +105,7 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
                              Bundle savedInstanceState) {
 
         //init loaders
-        getLoaderManager().initLoader(ILoader.MOOD_HISTORY_ALL_VALUES_LOADER, null, this);
+        getLoaderManager().initLoader(ILoader.MOOD_HISTORY_PER_QUARTER_DAY_LOADER, null, this);
         getLoaderManager().initLoader(ILoader.MOOD_HISTORY_PER_DAY_LOADER, null, this);
         getLoaderManager().initLoader(ILoader.MOOD_HISTORY_PER_WEEK_LOADER, null, this);
         getLoaderManager().initLoader(ILoader.MOOD_HISTORY_PER_MONTH_LOADER, null, this);
@@ -122,9 +126,9 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
 
         switch (selectedItem.getItemId()) {
             case R.id.menu_item_history_day_values:
-                if(mDisplayingLoader != ILoader.MOOD_HISTORY_ALL_VALUES_LOADER) {
-                    mDisplayingLoader = ILoader.MOOD_HISTORY_ALL_VALUES_LOADER;
-                    repopulateChart(allValuesCursor);
+                if(mDisplayingLoader != ILoader.MOOD_HISTORY_PER_QUARTER_DAY_LOADER) {
+                    mDisplayingLoader = ILoader.MOOD_HISTORY_PER_QUARTER_DAY_LOADER;
+                    repopulateChart(perQuarterDayCursor);
                 }
                 return true;
 
@@ -132,7 +136,6 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
                 if(mDisplayingLoader != ILoader.MOOD_HISTORY_PER_DAY_LOADER) {
                     mDisplayingLoader = ILoader.MOOD_HISTORY_PER_DAY_LOADER;
                     repopulateChart(perDayCursor);
-
                 }
                 return true;
 
@@ -151,9 +154,9 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
                 return true;
 
             case R.id.menu_item_share:
-                if(allValuesCursor != null) {
-                    if (allValuesCursor.moveToLast())
-                        ShareUtil.shareMood(getActivity(), MoodTableHelper.fromCursor(allValuesCursor));
+                if(perQuarterDayCursor != null) {
+                    if (perQuarterDayCursor.moveToLast())
+                        ShareUtil.shareMood(getActivity(), MoodTableHelper.fromCursor(perQuarterDayCursor));
                     else
                         Toast.makeText(getActivity(), R.string.message_no_moods_yet, Toast.LENGTH_SHORT).show();
                 } else {
@@ -185,7 +188,6 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
     private void repopulateChart(Cursor data) {
 
         final DecimalFormat twoDForm = new DecimalFormat("#,##");
-        final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", getResources().getConfiguration().locale);
         final ArrayList<String> xVals = new ArrayList<>();
         final ArrayList<LineDataSet> yVals = new ArrayList<>();
 
@@ -199,8 +201,10 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
             do {
 
                 mood = MoodTableHelper.fromCursor(data);
-                entries.add(index, new Entry(Float.parseFloat(twoDForm.format(mood.getMood())), index));
-                xVals.add(dateFormat.format(mood.getDate().getTime()));
+                Logger.verbose(ITag.MOOD_HISTORY, mood.toString());
+//                entries.add(index, new Entry(Float.parseFloat(twoDForm.format(mood.getMood())), index));
+                entries.add(index, new Entry(mood.getMood(), index));
+                xVals.add(simpleDateFormat.format(mood.getDate().getTime()));
                 index++;
 
             } while (data.moveToNext());
@@ -217,32 +221,30 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
 
         lineChart.setData(lineData);
 
-        if(mDisplayingLoader == ILoader.MOOD_HISTORY_ALL_VALUES_LOADER) {
+        if(mDisplayingLoader == ILoader.MOOD_HISTORY_PER_QUARTER_DAY_LOADER) {
 
             lineChart.setVisibleXRange(16);
-            lineChart.moveViewToX(lineData.getXValCount()-17);
-//                lineChart.setMaxVisibleValueCount(16); after 16 values, the values wont be drawn anymore...
-
-        } else if(mDisplayingLoader == ILoader.MOOD_HISTORY_PER_DAY_LOADER) {
-
-            lineChart.setVisibleXRange(7);
-            lineChart.moveViewToX(lineData.getXValCount()-8);
-//                lineChart.setMaxVisibleValueCount(16);
-
-        } else if(mDisplayingLoader == ILoader.MOOD_HISTORY_PER_WEEK_LOADER) {
-
-            lineChart.setVisibleXRange(4);
-            lineChart.moveViewToX(lineData.getXValCount()-5);
-//                lineChart.setMaxVisibleValueCount(16);
-
-        } else if(mDisplayingLoader == ILoader.MOOD_HISTORY_PER_MONTH_LOADER) {
-
-            lineChart.setVisibleXRange(4);
-            lineChart.moveViewToX(lineData.getXValCount()-5);
-//                lineChart.setMaxVisibleValueCount(16);
+            lineChart.moveViewToX(lineData.getXValCount() - 17);
         }
-
+        //This whole shit does not work!
+//        } else if(mDisplayingLoader == ILoader.MOOD_HISTORY_PER_DAY_LOADER) {
+//
+//            lineChart.setVisibleXRange(7);
+//            lineChart.moveViewToX(lineData.getXValCount()-8);
+//
+//        } else if(mDisplayingLoader == ILoader.MOOD_HISTORY_PER_WEEK_LOADER) {
+//
+//            lineChart.setVisibleXRange(4);
+//            lineChart.moveViewToX(lineData.getXValCount()-5);
+//
+//        } else if(mDisplayingLoader == ILoader.MOOD_HISTORY_PER_MONTH_LOADER) {
+//
+//            lineChart.setVisibleXRange(4);
+//            lineChart.moveViewToX(lineData.getXValCount()-5);
+//        }
         lineChart.invalidate();
+
+        lineChart.setMaxVisibleValueCount(18);//hide value labels after 18 values in viewport
         lineChart.getLegend().setEnabled(false);
     }
 
@@ -252,8 +254,8 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
         final Loader<Cursor> loader;
 
         switch(id) {
-            case ILoader.MOOD_HISTORY_ALL_VALUES_LOADER:
-                loader = MoodCursorHelper.getAllMoodsCursorLoader(getActivity());
+            case ILoader.MOOD_HISTORY_PER_QUARTER_DAY_LOADER:
+                loader = MoodCursorHelper.getAllMoodsAvgQuarterDayCursorLoader(getActivity());
                 break;
 
             case ILoader.MOOD_HISTORY_PER_DAY_LOADER:
@@ -278,9 +280,9 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
-        if(loader.getId() == ILoader.MOOD_HISTORY_ALL_VALUES_LOADER) {
+        if(loader.getId() == ILoader.MOOD_HISTORY_PER_QUARTER_DAY_LOADER) {
 
-            allValuesCursor = data;
+            perQuarterDayCursor = data;
 
         } else if(loader.getId() == ILoader.MOOD_HISTORY_PER_DAY_LOADER) {
 
@@ -306,8 +308,8 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
     public void onLoaderReset(Loader<Cursor> loader) {
 
         //remove ref to cursor since it was closed with the loader...
-        if(loader.getId() == ILoader.MOOD_HISTORY_ALL_VALUES_LOADER)
-            allValuesCursor = null;
+        if(loader.getId() == ILoader.MOOD_HISTORY_PER_QUARTER_DAY_LOADER)
+            perQuarterDayCursor = null;
         if(loader.getId() == ILoader.MOOD_HISTORY_PER_DAY_LOADER)
             perDayCursor = null;
         if(loader.getId() == ILoader.MOOD_HISTORY_PER_WEEK_LOADER)

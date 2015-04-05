@@ -14,4 +14,5 @@ public interface ITag {
 
     static final String DATABASE = "Database";
     static final String INITIALIZATION = "Initialization";
+    static final String AVERAGE_CALCULATOR = "AverageCalculator";
 }

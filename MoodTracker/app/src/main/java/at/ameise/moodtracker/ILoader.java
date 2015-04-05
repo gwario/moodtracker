@@ -11,4 +11,5 @@ public interface ILoader {
     static final int MOOD_HISTORY_PER_DAY_LOADER = 1;
     static final int MOOD_HISTORY_PER_WEEK_LOADER = 2;
     static final int MOOD_HISTORY_PER_MONTH_LOADER = 3;
+    static final int MOOD_HISTORY_PER_QUARTER_DAY_LOADER = 4;
 }

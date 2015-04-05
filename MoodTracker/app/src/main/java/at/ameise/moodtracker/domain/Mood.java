@@ -2,7 +2,11 @@ package at.ameise.moodtracker.domain;
 
 import java.util.Calendar;
 
+import at.ameise.moodtracker.ISetting;
+
 /**
+ * Representation of a single mood entry.
+ *
  * Created by Mario Gastegger <mario DOT gastegger AT gmail DOT com> on 14.02.15.
  */
 public class Mood {
@@ -33,7 +37,7 @@ public class Mood {
     public String toString() {
         return "Mood {" +
                 "mood=" + mood + ", " +
-                "date=" + date + ", " +
+                "date=" + ISetting.DEBUG_DATE_FORMAT.format(date.getTime()) + ", " +
                 "scope=" + scope +
                 '}';
     }

@@ -32,7 +32,7 @@ public class MoodTrackerApplication extends Application {
         if(!moodTrackerInitialized) {
 
             Logger.info(ITag.INITIALIZATION, "Initializing MoodTracker...");
-
+            //TODO maybe we should change that and reschedule the alarms every time..
             scheduleAlarms(this, alarmManager);
 
             applicationPreferences.edit().putBoolean(IPreference.KEY_APPLICATION_INITIALIZED, true).apply();
@@ -52,7 +52,7 @@ public class MoodTrackerApplication extends Application {
 
         final PendingIntent intent = PendingIntent.getBroadcast(ctx, 0, new Intent(ctx, QuarterDailyReceiver.class), PendingIntent.FLAG_UPDATE_CURRENT);
         final Calendar startTimeUTC = Calendar.getInstance();
-        CalendarUtil.setStartOfNextMonth(startTimeUTC);
+        CalendarUtil.setStartOfNextQuarterOfDay(startTimeUTC);
 
         alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, startTimeUTC.getTimeInMillis(), ITimeConstant.QUARTER_DAY_MILLIS, intent);
     }

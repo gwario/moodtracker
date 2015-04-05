@@ -1,5 +1,6 @@
 package at.ameise.moodtracker.domain;
 
+import android.content.ContentProviderOperation;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.CursorLoader;
@@ -7,8 +8,6 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-
-import java.util.Calendar;
 
 /**
  * Contains helper methods to operate on the mood database.
@@ -19,20 +18,24 @@ public final class MoodCursorHelper {
 
     /**
      * @param context   the context
-     * @return a {@link android.content.CursorLoader} on all {@link at.ameise.moodtracker.domain.Mood}s. Uses {@link at.ameise.moodtracker.domain.MoodTableHelper#SORT_ORDER_TIMESTAMP_ASC}.
+     * @return a {@link android.database.Cursor} on all {@link at.ameise.moodtracker.domain.Mood}s with {@link Mood#getScope()} = {@link at.ameise.moodtracker.domain.MoodTableHelper.EMoodScope#RAW}. Uses {@link at.ameise.moodtracker.domain.MoodTableHelper#SORT_ORDER_TIMESTAMP_ASC}.
      */
-    public static Loader<Cursor> getAllMoodsCursorLoader(Context context) {
+    public static Cursor getAllRawMoodsCursor(Context context) {
 
-        return new CursorLoader(context, MoodContentProvider.CONTENT_URI_MOOD, null, null, null, MoodTableHelper.SORT_ORDER_TIMESTAMP_ASC);
+        return context.getContentResolver().query(MoodContentProvider.CONTENT_URI_MOOD,
+                MoodTableHelper.ALL_COLUMNS,
+                MoodTableHelper.COL_SCOPE+" = *",
+                new String[] { MoodTableHelper.EMoodScope.RAW.getColumnValue(), },
+                MoodTableHelper.SORT_ORDER_TIMESTAMP_ASC);
     }
 
     /**
      * @param context   the context
-     * @return a {@link android.database.Cursor} on all {@link at.ameise.moodtracker.domain.Mood}s. Uses {@link at.ameise.moodtracker.domain.MoodTableHelper#SORT_ORDER_TIMESTAMP_ASC}.
+     * @return a {@link android.content.CursorLoader} on the quarter-day-average of all {@link at.ameise.moodtracker.domain.Mood}s. Uses {@link at.ameise.moodtracker.domain.MoodTableHelper#SORT_ORDER_TIMESTAMP_ASC}.
      */
-    public static Cursor getAllMoodsCursor(Context context) {
+    public static Loader<Cursor> getAllMoodsAvgQuarterDayCursorLoader(Context context) {
 
-        return context.getContentResolver().query(MoodContentProvider.CONTENT_URI_MOOD, null, null, null, MoodTableHelper.SORT_ORDER_TIMESTAMP_ASC);
+        return new CursorLoader(context, MoodContentProvider.CONTENT_URI_MOOD_AVG_QUARTER_DAY, MoodTableHelper.ALL_COLUMNS, null, null, MoodTableHelper.SORT_ORDER_TIMESTAMP_ASC);
     }
 
     /**
@@ -41,7 +44,7 @@ public final class MoodCursorHelper {
      */
     public static Loader<Cursor> getAllMoodsAvgDayCursorLoader(Context context) {
 
-        return new CursorLoader(context, MoodContentProvider.CONTENT_URI_MOOD_GB_DAY, null, null, null, MoodTableHelper.SORT_ORDER_TIMESTAMP_ASC);
+        return new CursorLoader(context, MoodContentProvider.CONTENT_URI_MOOD_AVG_DAY, MoodTableHelper.ALL_COLUMNS, null, null, MoodTableHelper.SORT_ORDER_TIMESTAMP_ASC);
     }
 
     /**
@@ -50,7 +53,7 @@ public final class MoodCursorHelper {
      */
     public static Loader<Cursor> getAllMoodsAvgWeekCursorLoader(Context context) {
 
-        return new CursorLoader(context, MoodContentProvider.CONTENT_URI_MOOD_GB_WEEK, null, null, null, MoodTableHelper.SORT_ORDER_TIMESTAMP_ASC);
+        return new CursorLoader(context, MoodContentProvider.CONTENT_URI_MOOD_AVG_WEEK, MoodTableHelper.ALL_COLUMNS, null, null, MoodTableHelper.SORT_ORDER_TIMESTAMP_ASC);
     }
 
     /**
@@ -59,7 +62,7 @@ public final class MoodCursorHelper {
      */
     public static Loader<Cursor> getAllMoodsAvgMonthCursorLoader(Context context) {
 
-        return new CursorLoader(context, MoodContentProvider.CONTENT_URI_MOOD_GB_MONTH, null, null, null, MoodTableHelper.SORT_ORDER_TIMESTAMP_ASC);
+        return new CursorLoader(context, MoodContentProvider.CONTENT_URI_MOOD_AVG_MONTH, MoodTableHelper.ALL_COLUMNS, null, null, MoodTableHelper.SORT_ORDER_TIMESTAMP_ASC);
     }
 
     /**
@@ -80,37 +83,6 @@ public final class MoodCursorHelper {
     }
 
     /**
-     * @param context   the context
-     * @param moodId    id of the mood to be loaded
-     * @return a {@link android.content.CursorLoader} on the {@link at.ameise.moodtracker.domain.Mood} with the specified id.
-     */
-    static Loader<Cursor> getMoodCursorLoader(Context context, long moodId) {
-
-        return new CursorLoader(context, MoodContentProvider.getCONTENT_URI_MOOD_ID(moodId), null, null, null, null);
-    }
-
-    /**
-     * @param context   the context
-     * @param timestamp timestamp of the mood to be loaded
-     * @return a {@link android.content.CursorLoader} on the {@link at.ameise.moodtracker.domain.Mood} with the specified timestamp.
-     */
-    public static Loader<Cursor> getMoodCursorLoader(Context context, Calendar timestamp) {
-
-        return new CursorLoader(context, MoodContentProvider.getCONTENT_URI_MOOD_DATE(timestamp), null, null, null, null);
-    }
-
-    /**
-     * @param context   the context
-     * @param fromTimestamp inclusive start of the time range
-     * @param toTimestamp   inclusive end of the time range
-     * @return a {@link android.content.CursorLoader} on the {@link at.ameise.moodtracker.domain.Mood}s with in the range. Uses {@link at.ameise.moodtracker.domain.MoodTableHelper#SORT_ORDER_TIMESTAMP_ASC}.
-     */
-    public static Loader<Cursor> getMoodCursorLoader(Context context, Calendar fromTimestamp, Calendar toTimestamp) {
-
-        return new CursorLoader(context, MoodContentProvider.getCONTENT_URI_MOOD_DATE_RANGE(fromTimestamp, toTimestamp), null, null, null, MoodTableHelper.SORT_ORDER_TIMESTAMP_ASC);
-    }
-
-    /**
      * Removes all {@link at.ameise.moodtracker.domain.Mood}s from the database.
      *
      * @param context   the context
@@ -121,42 +93,101 @@ public final class MoodCursorHelper {
     }
 
     /**
-     * Removes the {@link at.ameise.moodtracker.domain.Mood} with the specified id.
-     *
-     * @param context   the context
+     * @param database  the database
+     * @return a {@link android.database.Cursor} containing all the timestamps of raw mood values in ascending order. Uses {@link at.ameise.moodtracker.domain.MoodTableHelper#SORT_ORDER_TIMESTAMP_ASC}.
      */
-    public static void removeMood(Context context, long id) {
+    static Cursor getAllRawValueTimestamps(SQLiteDatabase database) {
 
-        context.getContentResolver().delete(MoodContentProvider.getCONTENT_URI_MOOD_ID(id), null, null);
+        return database.query(MoodTableHelper.TABLE_NAME,
+                new String[]{ MoodTableHelper.COL_TIMESTAMP, MoodTableHelper.COL_SCOPE, },
+                MoodTableHelper.COL_SCOPE+" = ?",
+                new String[] { MoodTableHelper.EMoodScope.RAW.getColumnValue(), },
+                null, null, MoodTableHelper.SORT_ORDER_TIMESTAMP_ASC);
     }
 
     /**
-     * Removes the {@link at.ameise.moodtracker.domain.Mood} with the specified timestamp.
-     *
-     * @param context   the context
+     * @param context  the context
+     * @return a {@link android.database.Cursor} containing all the timestamps of raw mood values in ascending order. Uses {@link at.ameise.moodtracker.domain.MoodTableHelper#SORT_ORDER_TIMESTAMP_ASC}.
      */
-    public static void removeMood(Context context, Calendar timestamp) {
+    static Cursor getAllRawValueTimestamps(Context context) {
 
-        context.getContentResolver().delete(MoodContentProvider.getCONTENT_URI_MOOD_DATE(timestamp), null, null);
+        //we use moods, since we want to project only timestamps and scope
+        return context.getContentResolver().query(MoodContentProvider.CONTENT_URI_MOOD,
+                new String[]{MoodTableHelper.COL_TIMESTAMP, MoodTableHelper.COL_SCOPE,},
+                MoodTableHelper.COL_SCOPE + " = ?",
+                new String[]{MoodTableHelper.EMoodScope.RAW.getColumnValue(),},
+                MoodTableHelper.SORT_ORDER_TIMESTAMP_ASC);
     }
 
     /**
-     * Removes the {@link at.ameise.moodtracker.domain.Mood} within the specified range.
-     *
-     * @param context   the context
+     * @param context  the context
+     * @return a {@link android.database.Cursor} containing all the timestamps of quarter daily average values in ascending order. Uses {@link at.ameise.moodtracker.domain.MoodTableHelper#SORT_ORDER_TIMESTAMP_ASC}.
      */
-    public static void removeMood(Context context, Calendar fromTimestamp, Calendar toTimestamp) {
+    static Cursor getAllQuarterDailyValueTimestamps(Context context) {
 
-        context.getContentResolver().delete(MoodContentProvider.getCONTENT_URI_MOOD_DATE_RANGE(fromTimestamp, toTimestamp), null, null);
+        //we use moods, since we want to project only timestamps and scope
+        return context.getContentResolver().query(MoodContentProvider.CONTENT_URI_MOOD,
+                new String[]{ MoodTableHelper.COL_TIMESTAMP, MoodTableHelper.COL_SCOPE, },
+                MoodTableHelper.COL_SCOPE+" = ?",
+                new String[] { MoodTableHelper.EMoodScope.QUARTER_DAY.getColumnValue(), },
+                MoodTableHelper.SORT_ORDER_TIMESTAMP_ASC);
     }
 
     /**
-     * @param database
-     * @return a {@link android.database.Cursor} containing all the timestamps in ascending order. Uses {@link at.ameise.moodtracker.domain.MoodTableHelper#SORT_ORDER_TIMESTAMP_ASC}.
+     * @param context  the context
+     * @return a {@link android.database.Cursor} containing all the timestamps of daily average values in ascending order. Uses {@link at.ameise.moodtracker.domain.MoodTableHelper#SORT_ORDER_TIMESTAMP_ASC}.
      */
-    static Cursor getAllTimestamps(SQLiteDatabase database) {
+    static Cursor getAllDailyValueTimestamps(Context context) {
 
-        return database.query(MoodTableHelper.TABLE_NAME, new String[]{MoodTableHelper.COL_TIMESTAMP,}, null, null, null, null, MoodTableHelper.SORT_ORDER_TIMESTAMP_ASC);
+        //we use moods, since we want to project only timestamps and scope
+        return context.getContentResolver().query(MoodContentProvider.CONTENT_URI_MOOD,
+                new String[]{ MoodTableHelper.COL_TIMESTAMP, MoodTableHelper.COL_SCOPE, },
+                MoodTableHelper.COL_SCOPE+" = ?",
+                new String[] { MoodTableHelper.EMoodScope.DAY.getColumnValue(), },
+                MoodTableHelper.SORT_ORDER_TIMESTAMP_ASC);
     }
 
+    /**
+     * @param context  the context
+     * @return a {@link android.database.Cursor} containing all the timestamps of weekly average values in ascending order. Uses {@link at.ameise.moodtracker.domain.MoodTableHelper#SORT_ORDER_TIMESTAMP_ASC}.
+     */
+    static Cursor getAllWeeklyValueTimestamps(Context context) {
+
+        //we use moods, since we want to project only timestamps and scope
+        return context.getContentResolver().query(MoodContentProvider.CONTENT_URI_MOOD,
+                new String[]{ MoodTableHelper.COL_TIMESTAMP, MoodTableHelper.COL_SCOPE, },
+                MoodTableHelper.COL_SCOPE+" = ?",
+                new String[] { MoodTableHelper.EMoodScope.WEEK.getColumnValue(), },
+                MoodTableHelper.SORT_ORDER_TIMESTAMP_ASC);
+    }
+
+    /**
+     * @param context  the context
+     * @return a {@link android.database.Cursor} containing all the timestamps of monthly average values in ascending order. Uses {@link at.ameise.moodtracker.domain.MoodTableHelper#SORT_ORDER_TIMESTAMP_ASC}.
+     */
+    static Cursor getAllMonthlyValueTimestamps(Context context) {
+
+        //we use moods, since we want to project only timestamps and scope
+        return context.getContentResolver().query(MoodContentProvider.CONTENT_URI_MOOD,
+                new String[]{ MoodTableHelper.COL_TIMESTAMP, MoodTableHelper.COL_SCOPE, },
+                MoodTableHelper.COL_SCOPE+" = ?",
+                new String[] { MoodTableHelper.EMoodScope.MONTH.getColumnValue(), },
+                MoodTableHelper.SORT_ORDER_TIMESTAMP_ASC);
+    }
+
+    /**
+     * @param context   the context
+     * @return a {@link android.database.Cursor} containing all quarter daily average moods sorted by timestamp in ascending order. Uses {@link at.ameise.moodtracker.domain.MoodTableHelper#SORT_ORDER_TIMESTAMP_ASC}.
+     */
+    public static Cursor getQuarterDailyMoodsCursor(Context context, String[] projection) {
+
+        if(projection == null)
+            projection = MoodTableHelper.ALL_COLUMNS;
+
+        return context.getContentResolver().query(MoodContentProvider.CONTENT_URI_MOOD,
+                projection,
+                MoodTableHelper.COL_SCOPE + " = ?",
+                new String[] { MoodTableHelper.EMoodScope.QUARTER_DAY.getColumnValue(), },
+                MoodTableHelper.SORT_ORDER_TIMESTAMP_ASC);
+    }
 }

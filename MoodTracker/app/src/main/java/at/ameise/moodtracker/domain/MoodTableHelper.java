@@ -17,10 +17,8 @@ public class MoodTableHelper {
     static final String COL_TIMESTAMP = "timestamp";
     static final String COL_SCOPE = "scope";
 
-    public static final String[] ALL_COLUMNS = { COL_ID, COL_MOOD, COL_TIMESTAMP, };
+    public static final String[] ALL_COLUMNS = { COL_ID, COL_MOOD, COL_TIMESTAMP, COL_SCOPE };
 
-    public static final String SORT_ORDER_MOOD_DESC = COL_MOOD + " desc";
-    public static final String SORT_ORDER_MOOD_ASC = COL_MOOD + " asc";
     public static final String SORT_ORDER_TIMESTAMP_DESC = COL_TIMESTAMP + " desc";
     public static final String SORT_ORDER_TIMESTAMP_ASC = COL_TIMESTAMP + " asc";
 
@@ -35,8 +33,8 @@ public class MoodTableHelper {
         return "CREATE TABLE IF NOT EXISTS " + tableName + "("
                 + COL_ID +" INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + COL_TIMESTAMP +" TEXT NOT NULL UNIQUE ON CONFLICT REPLACE,"
-                + COL_MOOD +" REAL NOT NULL"
-                + COL_SCOPE + " TEXT NOT NULL DEFAULT 'RAW'"
+                + COL_MOOD +" REAL NOT NULL,"
+                + COL_SCOPE + " TEXT NOT NULL DEFAULT '"+EMoodScope.RAW.getColumnValue()+"'"
                 +")";
     }
 
@@ -49,7 +47,7 @@ public class MoodTableHelper {
         final ContentValues values = new ContentValues();
 
         values.put(COL_MOOD, mood.getMood());
-        values.put(COL_TIMESTAMP, mood.getDate().getTimeInMillis() / 1000);
+        values.put(COL_TIMESTAMP, mood.getDateInSeconds());
         values.put(COL_SCOPE, mood.getScope().getColumnValue());
 
         return values;
@@ -101,7 +99,7 @@ public class MoodTableHelper {
             this.columnValue = columnValue;
         }
 
-        private String getColumnValue() {
+        String getColumnValue() {
             return columnValue;
         }
 
@@ -109,7 +107,7 @@ public class MoodTableHelper {
          * @param columnValue the column value for the scope.
          * @return the enum with the specified column value.
          */
-        private static EMoodScope fromColumnValue(String columnValue) {
+        static EMoodScope fromColumnValue(String columnValue) {
 
             for(EMoodScope scope : values()) {
                 if(scope.getColumnValue().equals(columnValue))

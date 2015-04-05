@@ -17,7 +17,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "mood.db";
 
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 7;
 
 
     private static DatabaseHelper INSTANCE = null;
@@ -60,7 +60,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             changeMoodTypeToReal(db);
         }
 
-        if(oldVersion <= 2) {
+        if(oldVersion <= 6) {
 
             addScopeColumn(db);
         }
@@ -75,7 +75,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     private void addScopeColumn(SQLiteDatabase db) {
 
-        db.execSQL("ALTER TABLE "+MoodTableHelper.TABLE_NAME+" ADD COLUMN "+MoodTableHelper.COL_SCOPE+" NOT NULL DEFAULT 'RAW'");
+        Logger.info(ITag.DATABASE, "Upgrading table '"+MoodTableHelper.TABLE_NAME+"': Adding column '"+MoodTableHelper.COL_SCOPE+"'...");
+
+        db.execSQL("ALTER TABLE "+MoodTableHelper.TABLE_NAME+" ADD COLUMN "+MoodTableHelper.COL_SCOPE+" NOT NULL DEFAULT '"+ MoodTableHelper.EMoodScope.RAW.getColumnValue()+"'");
     }
 
     /**
@@ -83,6 +85,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param db
      */
     private void changeMoodTypeToReal(SQLiteDatabase db) {
+
+        Logger.info(ITag.DATABASE, "Upgrading table '"+MoodTableHelper.TABLE_NAME+"': Changing type of column '"+MoodTableHelper.COL_MOOD+"' from integer to real...");
 
         final String MIGRATION_TABLE = "migrate_mood";
         //create new table

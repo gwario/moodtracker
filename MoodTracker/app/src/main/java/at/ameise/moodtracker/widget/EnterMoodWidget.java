@@ -131,7 +131,7 @@ public class EnterMoodWidget extends AppWidgetProvider {
 
         } else if (ACTION_SHARE_CLICKED.equals(intent.getAction())) {
 
-            final Cursor moodCursor = MoodCursorHelper.getAllMoodsCursor(context);
+            final Cursor moodCursor = MoodCursorHelper.getAllRawMoodsCursor(context);
 
             if(moodCursor.moveToLast()) {
 

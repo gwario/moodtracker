@@ -1,10 +1,11 @@
 package at.ameise.moodtracker.service;
 
 import android.app.IntentService;
-import android.content.Intent;
 import android.content.Context;
+import android.content.Intent;
 
 import at.ameise.moodtracker.ITag;
+import at.ameise.moodtracker.domain.AverageCalculatorHelper;
 import at.ameise.moodtracker.domain.MoodTableHelper;
 import at.ameise.moodtracker.util.Logger;
 
@@ -49,7 +50,7 @@ public class AverageCalculatorService extends IntentService {
 
 
     public AverageCalculatorService() {
-        super("MoodAggregatorService");
+        super("AverageCalculatorService");
     }
 
     @Override
@@ -82,60 +83,29 @@ public class AverageCalculatorService extends IntentService {
 
             if(MoodTableHelper.EMoodScope.QUARTER_DAY.name().equals(scope)) {
 
-                calculateQuarterDailyAverage();
+                Logger.debug(ITag.AVERAGE_CALCULATOR, "Calculating quarter daily average value.");
+
+                AverageCalculatorHelper.calculateQuarterDailyAverage(this);
 
             } else if(MoodTableHelper.EMoodScope.DAY.name().equals(scope)) {
 
-                calculateDailyAverage();
+                Logger.debug(ITag.AVERAGE_CALCULATOR, "Calculating daily average value.");
+
+                AverageCalculatorHelper.calculateDailyAverage(this);
 
             } else if(MoodTableHelper.EMoodScope.WEEK.name().equals(scope)) {
 
-                calculateWeeklyAverage();
+                Logger.debug(ITag.AVERAGE_CALCULATOR, "Calculating weekly average value.");
+
+                AverageCalculatorHelper.calculateWeeklyAverage(this);
 
             } else if(MoodTableHelper.EMoodScope.MONTH.name().equals(scope)) {
 
-                calculateMonthlyAverage();
+                Logger.debug(ITag.AVERAGE_CALCULATOR, "Calculating monthly average value.");
+
+                AverageCalculatorHelper.calculateMonthlyAverage(this);
             }
         }
     }
 
-    private void calculateMonthlyAverage() {
-
-        Logger.debug(ITag.DATABASE, "Calculating monthly average value.");
-
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-
-    private void calculateWeeklyAverage() {
-
-        Logger.debug(ITag.DATABASE, "Calculating weekly average value.");
-
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-
-    private void calculateDailyAverage() {
-
-        Logger.debug(ITag.DATABASE, "Calculating daily average value.");
-
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-
-    private void calculateQuarterDailyAverage() {
-
-        Logger.debug(ITag.DATABASE, "Calculating quarter daily average value.");
-
-        //TODO Find the last day for which no quarterly data exists.
-
-        //TODO select quarterly averages until now and insert them
-
-
-
-
-
-
-
-
-
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
 }
