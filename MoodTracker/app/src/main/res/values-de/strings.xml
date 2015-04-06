@@ -24,4 +24,10 @@
     <string name="textual_mood_very_bad">sehr schlecht gelaunt</string>
     <!-- /used for sharing messages -->
 
+    <!-- diagram x-axis date formats -->
+    <string name="history_date_format_quarterDaily">EEE dd MMM\' \'\'\'yy\' | \'K\' Uhr \'a</string>
+    <string name="history_date_format_daily">EEEE dd MMM\' \'\'\'yy</string>
+    <string name="history_date_format_weekly">\'Woche \'W\', \'MMMM\' \'\'\'yy</string>
+    <string name="history_date_format_monthly">MMMM yyyy</string>
+    <!-- /diagram x-axis date formats -->
 </resources>

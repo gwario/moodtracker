@@ -17,9 +17,7 @@ import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.utils.ValueFormatter;
 
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
@@ -42,7 +40,10 @@ import at.ameise.moodtracker.util.ShareUtil;
  */
 public class MoodHistoryFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    public SimpleDateFormat simpleDateFormat;
+    private SimpleDateFormat quarterDailyDateFormat;
+    private SimpleDateFormat dailyDateFormat;
+    private SimpleDateFormat weeklyDateFormat;
+    private SimpleDateFormat monthlyDateFormat;
 
     /**
      * Parameter to specify the loader to be used initially.
@@ -50,9 +51,7 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
     public static final String ARG_INITIAL_LOADER = "initialLoader";
 
     private int mDisplayingLoader;
-
     private LineChart lineChart;
-
     private Cursor perQuarterDayCursor;
     private Cursor perDayCursor;
     private Cursor perWeekCursor;
@@ -85,7 +84,10 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd", getResources().getConfiguration().locale);
+        quarterDailyDateFormat = new SimpleDateFormat(getString(R.string.history_date_format_quarterDaily), getResources().getConfiguration().locale);
+        dailyDateFormat = new SimpleDateFormat(getString(R.string.history_date_format_daily), getResources().getConfiguration().locale);
+        weeklyDateFormat = new SimpleDateFormat(getString(R.string.history_date_format_weekly), getResources().getConfiguration().locale);
+        monthlyDateFormat = new SimpleDateFormat(getString(R.string.history_date_format_monthly), getResources().getConfiguration().locale);
 
         if (getArguments() != null) {
 
@@ -144,28 +146,28 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
             case R.id.menu_item_history_day_values:
                 if(mDisplayingLoader != ILoader.MOOD_HISTORY_PER_QUARTER_DAY_LOADER) {
                     mDisplayingLoader = ILoader.MOOD_HISTORY_PER_QUARTER_DAY_LOADER;
-                    repopulateChart(perQuarterDayCursor);
+                    repopulateChart(perQuarterDayCursor, quarterDailyDateFormat);
                 }
                 return true;
 
             case R.id.menu_item_history_daily_avg:
                 if(mDisplayingLoader != ILoader.MOOD_HISTORY_PER_DAY_LOADER) {
                     mDisplayingLoader = ILoader.MOOD_HISTORY_PER_DAY_LOADER;
-                    repopulateChart(perDayCursor);
+                    repopulateChart(perDayCursor, dailyDateFormat);
                 }
                 return true;
 
             case R.id.menu_item_history_weekly_avg:
                 if(mDisplayingLoader != ILoader.MOOD_HISTORY_PER_WEEK_LOADER) {
                     mDisplayingLoader = ILoader.MOOD_HISTORY_PER_WEEK_LOADER;
-                    repopulateChart(perWeekCursor);
+                    repopulateChart(perWeekCursor, weeklyDateFormat);
                 }
                 return true;
 
             case R.id.menu_item_history_month_avg:
                 if(mDisplayingLoader != ILoader.MOOD_HISTORY_PER_MONTH_LOADER) {
                     mDisplayingLoader = ILoader.MOOD_HISTORY_PER_MONTH_LOADER;
-                    repopulateChart(perMonthCursor);
+                    repopulateChart(perMonthCursor, monthlyDateFormat);
                 }
                 return true;
 
@@ -201,11 +203,10 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
      * This method should be called after new data was loaded by the cursor providing loader.
      * @param data the cursor containing moods.
      */
-    private void repopulateChart(Cursor data) {
+    private void repopulateChart(Cursor data, SimpleDateFormat dateFormat) {
 
-        final DecimalFormat twoDForm = new DecimalFormat("#,##");
-        final ArrayList<String> xVals = new ArrayList<>();
-        final ArrayList<LineDataSet> yVals = new ArrayList<>();
+        final ArrayList<String> xValues = new ArrayList<>();
+        final ArrayList<LineDataSet> yValues = new ArrayList<>();
 
         if (data.moveToFirst()) {
 
@@ -218,9 +219,10 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
 
                 mood = MoodTableHelper.fromCursor(data);
                 Logger.verbose(ITag.MOOD_HISTORY, mood.toString());
-//                entries.add(index, new Entry(Float.parseFloat(twoDForm.format(mood.getMood())), index));
+
                 entries.add(index, new Entry(mood.getMood(), index));
-                xVals.add(simpleDateFormat.format(mood.getDate().getTime()));
+                xValues.add(dateFormat.format(mood.getDate().getTime()));
+
                 index++;
 
             } while (data.moveToNext());
@@ -229,35 +231,31 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
             lineData.setDrawCircles(true);
             lineData.setDrawCubic(false);
             lineData.setDrawFilled(true);
-            yVals.add(lineData);
+            yValues.add(lineData);
         }
         Logger.info(ITag.MOOD_HISTORY, "Found " + data.getCount() + " moods");
-        LineData lineData = new LineData(xVals, yVals);
+        LineData lineData = new LineData(xValues, yValues);
         lineData.setDrawValues(true);
 
         lineChart.setData(lineData);
 
-        if(mDisplayingLoader == ILoader.MOOD_HISTORY_PER_QUARTER_DAY_LOADER) {
-
-            lineChart.setVisibleXRange(16);
-            lineChart.moveViewToX(lineData.getXValCount() - 17);
-        }
-        //This whole shit does not work!
-//        } else if(mDisplayingLoader == ILoader.MOOD_HISTORY_PER_DAY_LOADER) {
+//        switch(cursorId) {
 //
-//            lineChart.setVisibleXRange(7);
-//            lineChart.moveViewToX(lineData.getXValCount()-8);
+//            case ILoader.MOOD_HISTORY_PER_DAY_LOADER:
+//                break;
 //
-//        } else if(mDisplayingLoader == ILoader.MOOD_HISTORY_PER_WEEK_LOADER) {
+//            case ILoader.MOOD_HISTORY_PER_WEEK_LOADER:
+//                break;
 //
-//            lineChart.setVisibleXRange(4);
-//            lineChart.moveViewToX(lineData.getXValCount()-5);
+//            case ILoader.MOOD_HISTORY_PER_MONTH_LOADER:
+//                break;
 //
-//        } else if(mDisplayingLoader == ILoader.MOOD_HISTORY_PER_MONTH_LOADER) {
+//            case ILoader.MOOD_HISTORY_PER_QUARTER_DAY_LOADER:
+//            default:
 //
-//            lineChart.setVisibleXRange(4);
-//            lineChart.moveViewToX(lineData.getXValCount()-5);
+//                break;
 //        }
+
         lineChart.invalidate();
 
         lineChart.getAxisLeft().setAxisMinValue(0.5f);
@@ -267,7 +265,7 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
         lineChart.getAxisRight().setAxisMaxValue(7.5f);
         lineChart.getAxisRight().setValueFormatter(new DefaultValueFormatter());
         lineChart.getLineData().setValueFormatter(new DefaultValueFormatter());
-        lineChart.setMaxVisibleValueCount(18);//hide value labels after 18 values in viewport
+//        lineChart.setMaxVisibleValueCount(18);//hide value labels after 18 values in viewport
         lineChart.getLegend().setEnabled(false);
     }
 
@@ -306,24 +304,26 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
         if(loader.getId() == ILoader.MOOD_HISTORY_PER_QUARTER_DAY_LOADER) {
 
             perQuarterDayCursor = data;
+            if(loader.getId() == mDisplayingLoader)
+                repopulateChart(data, quarterDailyDateFormat);
 
         } else if(loader.getId() == ILoader.MOOD_HISTORY_PER_DAY_LOADER) {
 
             perDayCursor = data;
+            if(loader.getId() == mDisplayingLoader)
+                repopulateChart(data, dailyDateFormat);
 
         } else if(loader.getId() == ILoader.MOOD_HISTORY_PER_WEEK_LOADER) {
 
             perWeekCursor = data;
+            if(loader.getId() == mDisplayingLoader)
+                repopulateChart(data, weeklyDateFormat);
 
         } else if(loader.getId() == ILoader.MOOD_HISTORY_PER_MONTH_LOADER) {
 
             perMonthCursor = data;
-        }
-
-
-        if(loader.getId() == mDisplayingLoader) {
-
-            repopulateChart(data);
+            if(loader.getId() == mDisplayingLoader)
+                repopulateChart(data, monthlyDateFormat);
         }
     }
 
