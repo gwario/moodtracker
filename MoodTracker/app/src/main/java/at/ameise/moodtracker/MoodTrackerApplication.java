@@ -5,7 +5,6 @@ import android.app.Application;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 
 import java.util.Calendar;
 
@@ -26,21 +25,10 @@ public class MoodTrackerApplication extends Application {
         Logger.info(ITag.INITIALIZATION, "MoodTracker created.");
 
         final AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        final SharedPreferences applicationPreferences = getSharedPreferences(IPreference.APPLICATION_PREFERENCES, Context.MODE_PRIVATE);
-        final boolean moodTrackerInitialized = applicationPreferences.getBoolean(IPreference.KEY_APPLICATION_INITIALIZED, false);
 
-        if(!moodTrackerInitialized) {
 
-            Logger.info(ITag.INITIALIZATION, "Initializing MoodTracker...");
-            //TODO maybe we should change that and reschedule the alarms every time..
-            scheduleAlarms(this, alarmManager);
-
-            applicationPreferences.edit().putBoolean(IPreference.KEY_APPLICATION_INITIALIZED, true).apply();
-
-        } else {
-
-            Logger.info(ITag.INITIALIZATION, "MoodTracker has already been initialized.");
-        }
+        Logger.info(ITag.INITIALIZATION, "Initializing MoodTracker...");
+        scheduleAlarms(this, alarmManager);
     }
 
     /**
