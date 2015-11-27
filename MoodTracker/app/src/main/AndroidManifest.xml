@@ -4,21 +4,36 @@
 
     <permission android:name="RECEIVE_BOOT_COMPLETED" />
 
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.USE_CREDENTIALS"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
+    <uses-permission android:name="at.ameise.moodtracker.permission.C2D_MESSAGE"/>
+
+    <permission android:name="at.ameise.moodtracker.permission.C2D_MESSAGE" android:protectionLevel="signature"/>
+
     <application
+        android:name=".MoodTrackerApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:name=".MoodTrackerApplication"
         android:theme="@style/AppTheme" >
-        <activity
-            android:name=".activity.MainActivity"
-            android:label="@string/app_name" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
+        <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version"/>
+
+        <activity
+            android:name=".activity.SignInActivity"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
+        <activity android:name=".activity.MainActivity"></activity>
+
 
         <provider
             android:name=".domain.MoodContentProvider"
@@ -52,12 +67,21 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-
         <receiver
             android:name=".receiver.QuarterDailyReceiver"
             android:enabled="true"
             android:exported="false" >
         </receiver>
+
+        <receiver
+            android:name=".api.GcmBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
+                <category android:name="at.ameise.moodtracker"/>
+            </intent-filter>
+        </receiver>
+        <service android:name=".api.GcmIntentService"/>
     </application>
 
 </manifest>
