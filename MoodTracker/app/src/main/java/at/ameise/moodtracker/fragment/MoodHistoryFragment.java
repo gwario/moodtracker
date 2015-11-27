@@ -27,6 +27,7 @@ import at.ameise.moodtracker.ISetting;
 import at.ameise.moodtracker.ITag;
 import at.ameise.moodtracker.R;
 import at.ameise.moodtracker.activity.SimpleImportExportActivity;
+import at.ameise.moodtracker.activity.SignInActivity;
 import at.ameise.moodtracker.domain.Mood;
 import at.ameise.moodtracker.domain.MoodCursorHelper;
 import at.ameise.moodtracker.domain.MoodTableHelper;
@@ -144,7 +145,9 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
     @Override
     public boolean onOptionsItemSelected(MenuItem selectedItem) {
 
-        switch (selectedItem.getItemId()) {
+        int itemId = selectedItem.getItemId();
+
+        switch (itemId) {
             case R.id.menu_item_history_day_values:
                 if(mDisplayingLoader != ILoader.MOOD_HISTORY_PER_QUARTER_DAY_LOADER) {
                     mDisplayingLoader = ILoader.MOOD_HISTORY_PER_QUARTER_DAY_LOADER;
@@ -190,6 +193,10 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
 
             case R.id.menu_item_import:
                 startActivity(new Intent().putExtra(SimpleImportExportActivity.EXTRA_IMPORT, true).setClass(getActivity(), SimpleImportExportActivity.class));
+                return true;
+
+            case R.id.menu_item_signOut:
+                SignInActivity.onSignOut(getActivity());
                 return true;
 
             default:

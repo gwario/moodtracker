@@ -1,15 +1,16 @@
+apply from: 'config.gradle'
 apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 21
     buildToolsVersion "21.1.2"
-
     defaultConfig {
         applicationId "at.ameise.moodtracker"
-        minSdkVersion 19
+        minSdkVersion 20
         targetSdkVersion 21
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -17,10 +18,15 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    productFlavors {
+    }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:multidex:1.0.0'
     compile 'com.github.PhilJay:MPAndroidChart:v2.0.7'
     compile 'com.android.support:support-v4:21.0.3'
+    compile 'com.google.android.gms:play-services:8.3.0'
+    compile project(path: ':backend', configuration: 'android-endpoints')
 }
