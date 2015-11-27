@@ -8,6 +8,7 @@
     <string name="options_menu_weekly_avg">Week</string>
     <string name="options_menu_monthly_avg">Month</string>
     <string name="options_menu_share">Share</string>
+    <string name="options_menu_signOut">Sign Out</string>
 
     <string name="share_chooser_text">Share most recent mood...</string>
 
@@ -29,5 +30,11 @@
     <string name="history_date_format_daily">EEE\', \'MMM\' \'dd\'. \'\'\'yy</string>
     <string name="history_date_format_weekly">\'Week \'W\', \'MMMM\' \'\'\'yy</string>
     <string name="history_date_format_monthly">MMMM yyyy</string>
+    <string name="title_activity_main_wear">MainWearActivity</string>
+    <string name="hello_round">Hello Round World!</string>
+    <string name="hello_square">Hello Square World!</string>
     <!-- /diagram x-axis date formats -->
+
+    <string name="gcmRegistrationError">An error occurred during registration. Trying again later</string>
+    <string name="gcmRegistrationSuccess">Device registered, registration ID= %1s</string>
 </resources>

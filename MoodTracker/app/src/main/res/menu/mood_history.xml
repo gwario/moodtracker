@@ -18,4 +18,9 @@
     <item android:id="@+id/menu_item_history_day_values"
         android:title="@string/options_menu_day_values"
         android:showAsAction="never"/>
+
+    <item
+        android:id="@+id/menu_item_signOut"
+        android:showAsAction="never"
+        android:title="@string/options_menu_signOut"/>
 </menu>
