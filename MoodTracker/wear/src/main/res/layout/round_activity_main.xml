@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    tools:context=".MainActivity"
+    tools:deviceIds="wear_round">
+
+
+    <LinearLayout
+        android:id="@+id/llMood"
+        android:orientation="horizontal"
+        android:weightSum="7"
+        android:layout_centerInParent="true"
+        android:layout_width="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_height="wrap_content">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/sad"
+            android:background="@android:color/transparent"
+            android:id="@+id/ibCurrentMoodWear0"
+            android:layout_weight="1"
+            android:adjustViewBounds="true"
+            android:scaleType="centerInside"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="2dp"
+            />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/dot_src_selector"
+            android:background="@android:color/transparent"
+            android:id="@+id/ibCurrentMoodWear1"
+            android:layout_weight="1"
+            android:adjustViewBounds="true"
+            android:scaleType="centerInside"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="2dp"
+            />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/dot_src_selector"
+            android:background="@android:color/transparent"
+            android:id="@+id/ibCurrentMoodWear2"
+            android:layout_weight="1"
+            android:adjustViewBounds="true"
+            android:scaleType="centerInside"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="2dp"
+            />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/average_src_selector"
+            android:background="@android:color/transparent"
+            android:id="@+id/ibCurrentMoodWear3"
+            android:layout_weight="1"
+            android:adjustViewBounds="true"
+            android:scaleType="centerInside"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="2dp"
+            />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/dot_src_selector"
+            android:background="@android:color/transparent"
+            android:id="@+id/ibCurrentMoodWear4"
+            android:layout_weight="1"
+            android:adjustViewBounds="true"
+            android:scaleType="centerInside"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="2dp"
+            />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/dot_src_selector"
+            android:background="@android:color/transparent"
+            android:id="@+id/ibCurrentMoodWear5"
+            android:layout_weight="1"
+            android:adjustViewBounds="true"
+            android:scaleType="centerInside"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="2dp"
+            />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/happy"
+            android:background="@android:color/transparent"
+            android:id="@+id/ibCurrentMoodWear6"
+            android:layout_weight="1"
+            android:adjustViewBounds="true"
+            android:scaleType="centerInside"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="2dp"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/llIncDec"
+        android:layout_below="@id/llMood"
+        android:layout_centerHorizontal="true"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/glyphicons_434_minus"
+            android:id="@+id/ibDecrementMood"
+            android:scaleType="centerInside"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="20dp"
+            />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/glyphicons_433_plus"
+            android:id="@+id/ibIncrementMood"
+            android:scaleType="centerInside"
+            android:layout_gravity="center_vertical"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_below="@id/llIncDec"
+        android:layout_centerHorizontal="true"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/glyphicons_417_disk_saved"
+            android:id="@+id/ibSetCurrentMood"
+            android:scaleType="centerInside"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="20dp"
+            />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/glyphicons_309_share_alt"
+            android:id="@+id/ibShareCurrentMood"
+            android:scaleType="centerInside"
+            android:layout_gravity="center_vertical"
+            />
+
+    </LinearLayout>
+
+</RelativeLayout>
