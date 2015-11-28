@@ -26,7 +26,9 @@ import com.google.api.client.http.HttpRequestInitializer;
 
 import java.io.IOException;
 
+import at.ameise.moodtracker.BuildConfig;
 import at.ameise.moodtracker.IApiConstants;
+import at.ameise.moodtracker.MoodTrackerApplication;
 import at.ameise.moodtracker.activity.SignInActivity;
 import at.ameise.moodtracker.moodTrackerBackend.MoodTrackerBackend;
 
@@ -37,8 +39,6 @@ import at.ameise.moodtracker.moodTrackerBackend.MoodTrackerBackend;
  * development.
  */
 public final class CloudEndpointBuilderHelper {
-
-
 
     /**
      * Default constructor, never called.
@@ -54,18 +54,18 @@ public final class CloudEndpointBuilderHelper {
     public static MoodTrackerBackend getEndpoints() {
 
         // Create API handler
-        MoodTrackerBackend.Builder builder = new MoodTrackerBackend.Builder(
-                AndroidHttp.newCompatibleTransport(),
-                new AndroidJsonFactory(), getRequestInitializer())
-                .setRootUrl(IApiConstants.ROOT_URL)
-                .setGoogleClientRequestInitializer(
-                        new GoogleClientRequestInitializer() {
-                            @Override
-                            public void initialize(final AbstractGoogleClientRequest<?> abstractGoogleClientRequest) throws IOException {
-                                abstractGoogleClientRequest.setDisableGZipContent(true);
-                            }
-                        }
-                );
+        MoodTrackerBackend.Builder builder = new MoodTrackerBackend.Builder(AndroidHttp.newCompatibleTransport(), new AndroidJsonFactory(), getRequestInitializer());
+
+        builder.setRootUrl(IApiConstants.ROOT_URL);
+        builder.setGoogleClientRequestInitializer(new GoogleClientRequestInitializer() {
+                @Override
+                public void initialize(final AbstractGoogleClientRequest<?> abstractGoogleClientRequest) throws IOException {
+
+                    abstractGoogleClientRequest.setDisableGZipContent(true);
+                }
+            }
+        );
+        builder.setApplicationName(MoodTrackerApplication.class.getSimpleName());
 
         return builder.build();
     }
@@ -76,9 +76,13 @@ public final class CloudEndpointBuilderHelper {
      * @return an appropriate HttpRequestInitializer.
      */
     static HttpRequestInitializer getRequestInitializer() {
+
         if (IApiConstants.SIGN_IN_REQUIRED) {
+
             return SignInActivity.getCredential();
+
         } else {
+
             return new HttpRequestInitializer() {
                 @Override
                 public void initialize(final HttpRequest arg0) {

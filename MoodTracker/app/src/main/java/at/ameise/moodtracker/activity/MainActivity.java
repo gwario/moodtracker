@@ -17,6 +17,7 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import java.io.IOException;
 
 import at.ameise.moodtracker.IApiConstants;
+import at.ameise.moodtracker.IPreference;
 import at.ameise.moodtracker.R;
 import at.ameise.moodtracker.domain.Mood;
 import at.ameise.moodtracker.fragment.EnterMoodFragment;
@@ -67,11 +68,14 @@ public class MainActivity extends Activity implements EnterMoodFragment.OnFragme
      * @return Application's version code from the {@code PackageManager}.
      */
     private static int getAppVersion(final Context context) {
+
         try {
-            PackageInfo packageInfo = context.getPackageManager()
-                    .getPackageInfo(context.getPackageName(), 0);
+
+            PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
             return packageInfo.versionCode;
+
         } catch (PackageManager.NameNotFoundException e) {
+
             // should never happen
             throw new RuntimeException("Could not get package name: " + e);
         }
@@ -92,9 +96,9 @@ public class MainActivity extends Activity implements EnterMoodFragment.OnFragme
 
         setContentView(R.layout.activity_main);
 
-        // Check device for Play Services APK. If check succeeds, proceed
-        // with GCM registration.
+        // Check device for Play Services APK. If check succeeds, proceed with GCM registration.
         if (checkPlayServices()) {
+
             gcm = GoogleCloudMessaging.getInstance(this);
             regId = getRegistrationId(context);
 
@@ -106,7 +110,9 @@ public class MainActivity extends Activity implements EnterMoodFragment.OnFragme
 
             }
         } else {
-            Logger.info(TAG, "No valid Google Play Services APK found.");
+
+            //Logger.info(TAG, "No valid Google Play Services APK found.");
+            throw new RuntimeException("No valid Google Play Services APK found.");
         }
 
         moodHistoryFragment = (MoodHistoryFragment) getFragmentManager().findFragmentById(R.id.get_mood);
@@ -142,19 +148,24 @@ public class MainActivity extends Activity implements EnterMoodFragment.OnFragme
      * registration ID.
      */
     private String getRegistrationId(final Context applicationContext) {
-        final SharedPreferences prefs = getGCMPreferences(context);
-        String registrationId = prefs.getString(PROPERTY_REG_ID, "");
+
+        final SharedPreferences sharedPreferences = getSharedPreferences(IPreference.APPLICATION_PREFERENCES, Context.MODE_PRIVATE);
+
+        String registrationId = sharedPreferences.getString(PROPERTY_REG_ID, "");
+
         if (registrationId.isEmpty()) {
+
             Logger.info(TAG, "Registration not found.");
             return "";
         }
         // Check if app was updated; if so, it must clear the registration ID
         // since the existing registration ID is not guaranteed to work with
         // the new app version.
-        int registeredVersion = prefs
-                .getInt(PROPERTY_APP_VERSION, Integer.MIN_VALUE);
+        int registeredVersion = sharedPreferences.getInt(PROPERTY_APP_VERSION, Integer.MIN_VALUE);
         int currentVersion = getAppVersion(context);
+
         if (registeredVersion != currentVersion) {
+
             Logger.info(TAG, "App version changed.");
             return "";
         }
@@ -167,27 +178,17 @@ public class MainActivity extends Activity implements EnterMoodFragment.OnFragme
      * @param applicationContext application's context.
      * @param registrationId     registration ID
      */
-    private void storeRegistrationId(final Context applicationContext,
-                                     final String registrationId) {
-        final SharedPreferences prefs = getGCMPreferences(applicationContext);
+    private void storeRegistrationId(final Context applicationContext, final String registrationId) {
+
+        final SharedPreferences sharedPreferences = getSharedPreferences(IPreference.APPLICATION_PREFERENCES, Context.MODE_PRIVATE);
+
         int appVersion = getAppVersion(applicationContext);
         Logger.info(TAG, "Saving regId on app version " + appVersion);
-        SharedPreferences.Editor editor = prefs.edit();
+
+        SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(PROPERTY_REG_ID, registrationId);
         editor.putInt(PROPERTY_APP_VERSION, appVersion);
         editor.apply();
-    }
-
-    /**
-     * @param applicationContext the Application context.
-     * @return Application's {@code SharedPreferences}.
-     */
-    private SharedPreferences getGCMPreferences(final Context
-                                                        applicationContext) {
-        // This sample app persists the registration ID in shared preferences,
-        // but how you store the registration ID in your app is up to you.
-        return getSharedPreferences(MainActivity.class.getSimpleName(),
-                Context.MODE_PRIVATE);
     }
 
     /**

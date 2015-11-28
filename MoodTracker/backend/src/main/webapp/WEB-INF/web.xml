@@ -24,7 +24,7 @@
         <init-param>
             <param-name>services</param-name>
             <param-value>
-                at.ameise.moodtracker.apis.CheckInEndpoint,
+                at.ameise.moodtracker.apis.SynchronizationEndpoint,
                 at.ameise.moodtracker.apis.RecommendationEndpoint,
                 at.ameise.moodtracker.apis.RegistrationEndpoint,
                 at.ameise.moodtracker.apis.MessagingEndpoint
