@@ -24,26 +24,21 @@ android {
          * The URL to the API. Default when running locally on your computer:
          * "http://10.0.2.2:8080/_ah/api/"
          */
-        buildConfigField "String", "ROOT_URL",  "\"http://10.0.2.2:8080/_ah/api/\""
+        buildConfigField "String", "ROOT_URL",  "\"https://grounded-braid-114120.appspot.com/_ah/api/\""
                 // The IP ADDRESS of your SERVER. Yours may be different.
         /**
          * Defines whether authentication is required or not. Only works once
          * deployed on production AppEngine, not on local server.
          */
-        buildConfigField "boolean", "SIGN_IN_REQUIRED", "false"
+        buildConfigField "boolean", "SIGN_IN_REQUIRED", "true"
         /**
          * Substitute you own sender ID here. This is the project number you got
          * from the API Console, as described in "Getting Started."
          */
-        buildConfigField "String", "SENDER_ID", "\"YOUR-SENDER-ID\""
+        buildConfigField "String", "SENDER_ID", "\"1008624441817\""
         /**
          * Web client ID from Google Cloud console.
          */
-        buildConfigField "String", "WEB_CLIENT_ID", "\"YOUR-WEB-CLIENT-ID\""
-        /**
-         * Dummy location used in the emulator when developing.
-         */
-        buildConfigField "float", "DUMMY_LONGITUDE", "-122.11111f"
-        buildConfigField "float", "DUMMY_LATITUDE", "37.22222f"
+        buildConfigField "String", "WEB_CLIENT_ID", "\"1008624441817-c2fcrutro43qsqcrkn7j91p744iaoofu.apps.googleusercontent.com\""
     }
 }

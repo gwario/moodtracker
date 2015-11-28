@@ -17,7 +17,7 @@
 package at.ameise.moodtracker.apis;
 
 import com.google.appengine.repackaged.com.google.common.collect.ImmutableMap;
-import at.ameise.moodtracker.models.Recommendation;
+
 import at.ameise.moodtracker.utils.CheckInUtil;
 
 import java.io.IOException;
@@ -55,7 +55,7 @@ public class RecommendationServlet extends HttpServlet {
      * Log output.
      */
     private static final Logger LOG = Logger
-            .getLogger(CheckInEndpoint.class.getName());
+            .getLogger(SynchronizationEndpoint.class.getName());
 
     /**
      * Random generator.

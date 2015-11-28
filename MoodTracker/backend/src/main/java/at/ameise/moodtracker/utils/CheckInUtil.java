@@ -16,8 +16,6 @@
 
 package at.ameise.moodtracker.utils;
 
-import at.ameise.moodtracker.models.CheckIn;
-
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
@@ -25,7 +23,7 @@ import java.util.logging.Logger;
 import static at.ameise.moodtracker.OfyService.ofy;
 
 /**
- * CheckIn Utility class.
+ * Synchronization Utility class.
  */
 public final class CheckInUtil {
 
@@ -48,17 +46,17 @@ public final class CheckInUtil {
      * @param userEmail The email address of the user.
      * @param placeId   The id of the place.
      * @param dateFrom  The start date for matching check in.
-     * @return List of all matching CheckIn entities.
+     * @return List of all matching Synchronization entities.
      */
     @SuppressWarnings({"cast", "unchecked"})
-    public static List<CheckIn> getCheckInsForUser(final String userEmail,
+    public static List<Synchronization> getCheckInsForUser(final String userEmail,
             final String placeId, final Date dateFrom) {
 
         LOG.info("list checkins for user = " + userEmail
                 + " checked into place = " + placeId
                 + "after " + dateFrom);
 
-        return ofy().load().type(CheckIn.class)
+        return ofy().load().type(Synchronization.class)
                 .filter("userEmail", userEmail)
                 .filter("placeId", placeId)
                 .filter("checkinDate >", dateFrom)

@@ -25,8 +25,7 @@ import com.google.api.server.spi.config.Named;
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.users.User;
-import at.ameise.moodtracker.Constants;
-import at.ameise.moodtracker.models.CheckIn;
+import at.ameise.moodtracker.IApiConstants;
 import at.ameise.moodtracker.utils.EndpointUtil;
 
 import java.util.Date;
@@ -38,32 +37,30 @@ import static at.ameise.moodtracker.OfyService.ofy;
 
 
 /**
- * Exposes REST API over CheckIn resources.
+ * Exposes REST API over Synchronization resources.
  */
 @Api(name = "moodTrackerBackend", version = "v1",
         namespace = @ApiNamespace(
-                ownerDomain = Constants.API_OWNER,
-                ownerName = Constants.API_OWNER,
-                packagePath = Constants.API_PACKAGE_PATH
+                ownerDomain = IApiConstants.API_OWNER,
+                ownerName = IApiConstants.API_OWNER,
+                packagePath = IApiConstants.API_PACKAGE_PATH
         )
 )
-@ApiClass(resource = "checkins",
+@ApiClass(resource = "synchronize",
         clientIds = {
-                Constants.ANDROID_CLIENT_ID,
-                Constants.IOS_CLIENT_ID,
-                Constants.WEB_CLIENT_ID},
-        audiences = {Constants.AUDIENCE_ID}
+                IApiConstants.ANDROID_CLIENT_ID,
+                IApiConstants.WEB_CLIENT_ID},
+        audiences = {IApiConstants.AUDIENCE_ID}
 )
 /**
  * An endpoint class we are exposing.
  */
-public class CheckInEndpoint {
+public class SynchronizationEndpoint {
 
     /**
      * Log output.
      */
-    private static final Logger LOG =
-            Logger.getLogger(CheckInEndpoint.class.getName());
+    private static final Logger LOG = Logger.getLogger(SynchronizationEndpoint.class.getName());
 
     /**
      * Lists all the entities inserted in datastore.
@@ -73,11 +70,11 @@ public class CheckInEndpoint {
      * authorized
      */
     @SuppressWarnings({"cast", "unchecked"})
-    public final List<CheckIn> listCheckIn(final User user) throws
+    public final List<Synchronization> listCheckIn(final User user) throws
             ServiceException {
         EndpointUtil.throwIfNotAdmin(user);
 
-        return ofy().load().type(CheckIn.class).list();
+        return ofy().load().type(Synchronization.class).list();
     }
 
     /**
@@ -89,7 +86,7 @@ public class CheckInEndpoint {
      * authorized
      */
     @ApiMethod(httpMethod = "GET")
-    public final CheckIn getCheckIn(@Named("id") final Long id, final User user)
+    public final Synchronization getCheckIn(@Named("id") final Long id, final User user)
             throws ServiceException {
         EndpointUtil.throwIfNotAdmin(user);
 
@@ -105,12 +102,12 @@ public class CheckInEndpoint {
      * authorized
      */
     @ApiMethod(httpMethod = "POST")
-    public final CheckIn insertCheckIn(final CheckIn checkin, final User user)
-            throws ServiceException {
+    public final Synchronization insertCheckIn(final Synchronization checkin, final User user) throws ServiceException {
+
         EndpointUtil.throwIfNotAuthenticated(user);
 
         checkin.setUserEmail(user.getEmail());
-        checkin.setCheckInDate(new Date());
+        checkin.setTimestamp(new Date());
 
         // Do not use the key provided by the caller; use a generated key.
         checkin.clearKey();
@@ -133,7 +130,7 @@ public class CheckInEndpoint {
      * authorized
      */
     @ApiMethod(httpMethod = "PUT")
-    public final CheckIn updateCheckIn(final CheckIn checkin, final User user)
+    public final Synchronization updateCheckIn(final Synchronization checkin, final User user)
             throws ServiceException {
         EndpointUtil.throwIfNotAdmin(user);
 
@@ -154,22 +151,22 @@ public class CheckInEndpoint {
             throws ServiceException {
         EndpointUtil.throwIfNotAdmin(user);
 
-        CheckIn checkIn = findCheckIn(id);
-        if (checkIn == null) {
+        Synchronization synchronization = findCheckIn(id);
+        if (synchronization == null) {
             LOG.info(
-                    "CheckIn " + id + " not found, skipping deletion.");
+                    "Synchronization " + id + " not found, skipping deletion.");
             return;
         }
-        ofy().delete().entity(checkIn).now();
+        ofy().delete().entity(synchronization).now();
     }
 
     /**
      * Searches an entity by ID.
      * @param id the checkin ID to search
-     * @return the CheckIn associated to id
+     * @return the Synchronization associated to id
      */
-    private CheckIn findCheckIn(final Long id) {
-        return ofy().load().type(CheckIn.class).id(id).now();
+    private Synchronization findCheckIn(final Long id) {
+        return ofy().load().type(Synchronization.class).id(id).now();
     }
 
     /**

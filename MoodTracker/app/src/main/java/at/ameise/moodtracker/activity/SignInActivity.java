@@ -18,18 +18,22 @@ package at.ameise.moodtracker.activity;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.games.multiplayer.InvitationRef;
 import com.google.api.client.googleapis.extensions.android.gms.auth
         .GoogleAccountCredential;
 
 import android.accounts.AccountManager;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 
 import at.ameise.moodtracker.IApiConstants;
+import at.ameise.moodtracker.IPreference;
 import at.ameise.moodtracker.R;
+import at.ameise.moodtracker.util.Logger;
 
 /**
  * Activity that allows the user to select the account they want to use to sign
@@ -40,20 +44,8 @@ public class SignInActivity extends Activity {
 
     public static final String TAG = SignInActivity.class.getSimpleName();
 
-    /**
-     * Name of the key for the shared preferences to access the current
-     * * signed in account.
-     */
-    private static final String ACCOUNT_NAME_SETTING_NAME = "accountName";
 
-    /**
-     *  Constant for startActivityForResult flow.
-     */
     private static final int REQUEST_ACCOUNT_PICKER = 1;
-
-    /**
-     *  Constant for startActivityForResult flow.
-     */
     private static final int REQUEST_GOOGLE_PLAY_SERVICES = 2;
 
     /**
@@ -76,11 +68,11 @@ public class SignInActivity extends Activity {
      * @param activity activity that initiated the sign out.
      */
     public static void onSignOut(final Activity activity) {
-        SharedPreferences settings = activity
-                .getSharedPreferences("MobileAssistant", 0);
+
+        SharedPreferences settings = activity.getSharedPreferences(IPreference.APPLICATION_PREFERENCES, 0);
 
         SharedPreferences.Editor editor = settings.edit();
-        editor.putString(ACCOUNT_NAME_SETTING_NAME, "");
+        editor.putString(IPreference.KEY_ACCOUNT_NAME, "");
 
         editor.apply();
         credential.setSelectedAccountName("");
@@ -116,10 +108,12 @@ public class SignInActivity extends Activity {
         }
 
         if (isSignedIn()) {
+
             startMainActivity();
+
         } else {
-            startActivityForResult(credential.newChooseAccountIntent(),
-                    REQUEST_ACCOUNT_PICKER);
+
+            startActivityForResult(credential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
         }
 
     }
@@ -129,28 +123,36 @@ public class SignInActivity extends Activity {
      * install Google Play Services.
      */
     @Override
-    protected final void onActivityResult(final int requestCode,
-            final int resultCode, final Intent data) {
+    protected final void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+
         super.onActivityResult(requestCode, resultCode, data);
+
         switch (requestCode) {
+
             case REQUEST_GOOGLE_PLAY_SERVICES:
+
                 if (resultCode != Activity.RESULT_OK) {
+
                     checkPlayServices();
                 }
                 break;
+
             case REQUEST_ACCOUNT_PICKER:
             default:
+
                 if (data != null && data.getExtras() != null) {
-                    String accountName = data.getExtras()
-                            .getString(AccountManager.KEY_ACCOUNT_NAME);
+
+                    String accountName = data.getExtras().getString(AccountManager.KEY_ACCOUNT_NAME);
+
                     if (accountName != null) {
+
                         onSignedIn(accountName);
                         return;
                     }
                 }
                 // Signing in is required so display the dialog again
-                startActivityForResult(credential.newChooseAccountIntent(),
-                        REQUEST_ACCOUNT_PICKER);
+                startActivityForResult(credential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
+
                 break;
         }
     }
@@ -162,12 +164,14 @@ public class SignInActivity extends Activity {
      * @return a boolean indicating if the user is signed in or not
      */
     private boolean isSignedIn() {
-        credential = GoogleAccountCredential.usingAudience(this,
-                IApiConstants.AUDIENCE_ANDROID_CLIENT_ID);
-        SharedPreferences settings = getSharedPreferences("MobileAssistant", 0);
-        String accountName = settings
-                .getString(ACCOUNT_NAME_SETTING_NAME, null);
+
+        credential = GoogleAccountCredential.usingAudience(this, IApiConstants.AUDIENCE_ANDROID_CLIENT_ID);
+
+        SharedPreferences sharedPreferences = getSharedPreferences(IPreference.APPLICATION_PREFERENCES, Context.MODE_PRIVATE);
+        String accountName = sharedPreferences.getString(IPreference.KEY_ACCOUNT_NAME, null);
+
         credential.setSelectedAccountName(accountName);
+
         return credential.getSelectedAccount() != null;
     }
 
@@ -177,12 +181,13 @@ public class SignInActivity extends Activity {
      * @param accountName the account that the user selected.
      */
     private void onSignedIn(final String accountName) {
-        SharedPreferences settings = getSharedPreferences("MobileAssistant", 0);
+
+        SharedPreferences sharedPreferences = getSharedPreferences(IPreference.APPLICATION_PREFERENCES, Context.MODE_PRIVATE);
 
         credential.setSelectedAccountName(accountName);
 
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putString(ACCOUNT_NAME_SETTING_NAME, accountName);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(IPreference.KEY_ACCOUNT_NAME, accountName);
         editor.apply();
 
         startMainActivity();
@@ -193,6 +198,7 @@ public class SignInActivity extends Activity {
      * MainActivity.
      */
     private void startMainActivity() {
+
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
@@ -200,6 +206,7 @@ public class SignInActivity extends Activity {
     @Override
     protected final void onResume() {
         super.onResume();
+
         if (IApiConstants.SIGN_IN_REQUIRED) {
             // As per GooglePlayServices documentation, an application needs to
             // check from within onResume if Google Play Services is available.
@@ -213,14 +220,18 @@ public class SignInActivity extends Activity {
      * @return a boolean indicating if the Google Play Services are available.
      */
     private boolean checkPlayServices() {
-        int resultCode = GooglePlayServicesUtil
-                .isGooglePlayServicesAvailable(this);
+
+        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+
         if (resultCode != ConnectionResult.SUCCESS) {
+
             if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
-                GooglePlayServicesUtil.getErrorDialog(resultCode, this,
-                        MainActivity.PLAY_SERVICES_RESOLUTION_REQUEST).show();
+
+                GooglePlayServicesUtil.getErrorDialog(resultCode, this, MainActivity.PLAY_SERVICES_RESOLUTION_REQUEST).show();
+
             } else {
-                Log.i(TAG, "This device is not supported.");
+
+                Logger.info(TAG, "This device is not supported.");
                 finish();
             }
             return false;

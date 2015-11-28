@@ -3,7 +3,7 @@ package at.ameise.moodtracker;
 /**
  * Contains some time constants.
  *
- * Created by Mario Gastegger <mgastegger AT buzzmark DOT com> on 04.04.15.
+ * Created by Mario Gastegger <mario DOT gastegger AT gmail DOT com> on 04.04.15.
  */
 public interface ITimeConstant {
 

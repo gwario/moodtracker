@@ -75,29 +75,29 @@ public class GcmIntentService extends IntentService {
              * you don't recognize.
              */
             switch (messageType) {
+
                 case GoogleCloudMessaging.MESSAGE_TYPE_DELETED:
                     sendNotification("Deleted messages on server: " + extras.toString());
                     // If it's a regular GCM message, do some work.
                     break;
+
                 case GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE:
+
                     if (intent.getStringExtra("NotificationKind").equals("PriceCheckLowerPrices1")) {
-                        final String message
-                                = getUserMessageForPriceCheckLowerPricesNotif(
-                                intent);
+
+                        final String message = getUserMessageForPriceCheckLowerPricesNotif(intent);
 
                         Handler h = new Handler(Looper.getMainLooper());
                         h.post(new Runnable() {
                             @Override
                             public void run() {
-                                Toast toast = Toast
-                                        .makeText(getApplicationContext(),
-                                                message,
-                                                Toast.LENGTH_LONG);
-                                toast.show();
+
+                                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
                             }
                         });
                     }
                     break;
+
                 case GoogleCloudMessaging.MESSAGE_TYPE_SEND_ERROR:
                 default:
                     sendNotification("Send error: " + extras.toString());

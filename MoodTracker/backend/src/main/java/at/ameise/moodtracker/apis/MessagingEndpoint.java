@@ -25,7 +25,7 @@ import com.google.api.server.spi.config.ApiClass;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiNamespace;
 import com.google.appengine.repackaged.com.google.common.collect.ImmutableMap;
-import at.ameise.moodtracker.Constants;
+import at.ameise.moodtracker.IApiConstants;
 import at.ameise.moodtracker.models.Registration;
 
 import java.io.IOException;
@@ -47,17 +47,16 @@ import static at.ameise.moodtracker.OfyService.ofy;
  */
 @Api(name = "moodTrackerBackend", version = "v1",
         namespace = @ApiNamespace(
-                ownerDomain = Constants.API_OWNER,
-                ownerName = Constants.API_OWNER,
-                packagePath = Constants.API_PACKAGE_PATH
+                ownerDomain = IApiConstants.API_OWNER,
+                ownerName = IApiConstants.API_OWNER,
+                packagePath = IApiConstants.API_PACKAGE_PATH
         )
 )
 @ApiClass(resource = "messaging",
         clientIds = {
-                Constants.ANDROID_CLIENT_ID,
-                Constants.IOS_CLIENT_ID,
-                Constants.WEB_CLIENT_ID},
-        audiences = {Constants.AUDIENCE_ID}
+                IApiConstants.ANDROID_CLIENT_ID,
+                IApiConstants.WEB_CLIENT_ID},
+        audiences = {IApiConstants.AUDIENCE_ID}
 )
 public class MessagingEndpoint {
 
@@ -91,7 +90,7 @@ public class MessagingEndpoint {
             return;
         }
 
-        Sender sender = new Sender(Constants.GCM_API_KEY);
+        Sender sender = new Sender(IApiConstants.GCM_API_KEY);
         Message msg = new Message.Builder()
                 .setData(payload)
                 .build();

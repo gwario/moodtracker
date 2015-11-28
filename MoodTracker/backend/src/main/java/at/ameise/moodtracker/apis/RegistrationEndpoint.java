@@ -25,7 +25,7 @@ import com.google.api.server.spi.config.Named;
 import com.google.api.server.spi.response.CollectionResponse;
 import com.google.api.server.spi.response.UnauthorizedException;
 import com.google.appengine.api.users.User;
-import at.ameise.moodtracker.Constants;
+import at.ameise.moodtracker.IApiConstants;
 import at.ameise.moodtracker.models.Registration;
 import at.ameise.moodtracker.utils.EndpointUtil;
 
@@ -48,25 +48,20 @@ import static at.ameise.moodtracker.OfyService.ofy;
  */
 @Api(name = "moodTrackerBackend", version = "v1",
         namespace = @ApiNamespace(
-                ownerDomain = Constants.API_OWNER,
-                ownerName = Constants.API_OWNER,
-                packagePath = Constants.API_PACKAGE_PATH
+                ownerDomain = IApiConstants.API_OWNER,
+                ownerName = IApiConstants.API_OWNER,
+                packagePath = IApiConstants.API_PACKAGE_PATH
         )
 )
 @ApiClass(resource = "registrations",
         clientIds = {
-                Constants.ANDROID_CLIENT_ID,
-                Constants.IOS_CLIENT_ID,
-                Constants.WEB_CLIENT_ID},
-        audiences = {Constants.AUDIENCE_ID}
+                IApiConstants.ANDROID_CLIENT_ID,
+                IApiConstants.WEB_CLIENT_ID},
+        audiences = {IApiConstants.AUDIENCE_ID}
 )
 public class RegistrationEndpoint {
 
-    /**
-     * Log output.
-     */
-    private static final Logger LOG = Logger
-            .getLogger(CheckInEndpoint.class.getName());
+    private static final Logger LOG = Logger.getLogger(SynchronizationEndpoint.class.getName());
 
 
     /**
@@ -77,14 +72,16 @@ public class RegistrationEndpoint {
      * user is unauthenticated
      */
     @ApiMethod(httpMethod = "POST")
-    public final void registerDevice(@Named("regId") final String regId,
-            final User user) throws UnauthorizedException {
+    public final void registerDevice(@Named("regId") final String regId, final User user) throws UnauthorizedException {
+
         EndpointUtil.throwIfNotAuthenticated(user);
+
         if (findRecord(regId) != null) {
-            LOG.info("Device " + regId
-                    + " already registered, skipping register");
+
+            LOG.info("Device " + regId + " already registered, skipping register");
             return;
         }
+
         Registration record = new Registration();
         record.setRegId(regId);
         ofy().save().entity(record).now();
@@ -98,15 +95,17 @@ public class RegistrationEndpoint {
      * user is unauthorized
      */
     @ApiMethod(httpMethod = "DELETE")
-    public final void unregisterDevice(@Named("regId") final String regId,
-            final User user) throws UnauthorizedException {
+    public final void unregisterDevice(@Named("regId") final String regId, final User user) throws UnauthorizedException {
+
         EndpointUtil.throwIfNotAdmin(user);
+
         Registration record = findRecord(regId);
         if (record == null) {
-            LOG.info(
-                    "Device " + regId + " not registered, skipping unregister");
+
+            LOG.info("Device " + regId + " not registered, skipping unregister");
             return;
         }
+
         ofy().delete().entity(record).now();
     }
 
@@ -119,15 +118,13 @@ public class RegistrationEndpoint {
      * user is unauthorized
      */
     @ApiMethod(httpMethod = "GET")
-    public final CollectionResponse<Registration> listDevices(
-            @Named("count") final int count,
-            final User user) throws UnauthorizedException {
+    public final CollectionResponse<Registration> listDevices(@Named("count") final int count, final User user) throws UnauthorizedException {
+
         EndpointUtil.throwIfNotAdmin(user);
-        List<Registration> records = ofy().load()
-                .type(Registration.class).limit(count)
-                .list();
-        return CollectionResponse.<Registration>builder()
-                .setItems(records).build();
+
+        List<Registration> records = ofy().load().type(Registration.class).limit(count).list();
+
+        return CollectionResponse.<Registration>builder().setItems(records).build();
     }
 
     /**
@@ -136,8 +133,8 @@ public class RegistrationEndpoint {
      * @return the Registration associated to regId
      */
     private Registration findRecord(final String regId) {
-        return ofy().load().type(Registration.class)
-                .filter("regId", regId).first().now();
+
+        return ofy().load().type(Registration.class).filter("regId", regId).first().now();
     }
 
 }
