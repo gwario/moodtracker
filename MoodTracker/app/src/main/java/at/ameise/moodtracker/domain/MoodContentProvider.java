@@ -31,8 +31,6 @@ public class MoodContentProvider extends ContentProvider {
 
     private static final String BASE_PATH_MOOD = "mood";
 
-    public static final Uri CONTENT_URI_MOOD = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH_MOOD);
-
     /**
      * NOTE: Selection, SelectionArgs and Order are ignored!
      * @param fromTimestamp inclusive start date
@@ -44,6 +42,7 @@ public class MoodContentProvider extends ContentProvider {
         return Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH_MOOD + "/avg/" + "date?from=" + fromTimestamp.getTimeInMillis()/1000 +"&to="+toTimestamp.getTimeInMillis()/1000+"&source_scope="+sourceScope.getColumnValue());
     }
 
+    public static final Uri CONTENT_URI_MOOD = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH_MOOD);
     public static final Uri CONTENT_URI_MOOD_AVG_QUARTER_DAY = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH_MOOD+ "/avg/quarterDay");
     public static final Uri CONTENT_URI_MOOD_AVG_DAY = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH_MOOD+ "/avg/day");
     public static final Uri CONTENT_URI_MOOD_AVG_WEEK = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH_MOOD+ "/avg/week");

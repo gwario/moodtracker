@@ -18,4 +18,13 @@
     <item android:id="@+id/menu_item_history_day_values"
         android:title="@string/options_menu_day_values"
         android:showAsAction="never"/>
+
+    <item android:id="@+id/menu_item_export"
+        android:title="@string/options_menu_export"
+        android:showAsAction="never"/>
+
+    <item android:id="@+id/menu_item_import"
+        android:title="@string/options_menu_import"
+        android:showAsAction="never"/>
+
 </menu>

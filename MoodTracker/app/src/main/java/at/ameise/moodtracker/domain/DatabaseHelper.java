@@ -53,7 +53,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
-        Logger.info(ITag.DATABASE, "Upgrading mood table from version "+oldVersion+" to version "+newVersion);
+        Logger.info(ITag.DATABASE, "Upgrading mood table from version " + oldVersion + " to version " + newVersion);
 
         if(oldVersion <= 1) {
 
@@ -65,12 +65,38 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             addScopeColumn(db);
         }
 
+        if(oldVersion <= 7) {
+
+            removeMyScopeColumn(db);
+        }
+
         //onDrop(db);
         //onCreate(db);
     }
 
     /**
-     * Adds a new column to the mood table to allow
+     * Removes the strange myscope column.
+     * @param db
+     */
+    private void removeMyScopeColumn(SQLiteDatabase db) {
+
+        Logger.info(ITag.DATABASE, "Upgrading table '"+MoodTableHelper.TABLE_NAME+"': Removing column 'myscope'...");
+
+        final String MIGRATION_TABLE = "migrate_mood";
+        //create new table
+        db.execSQL(MoodTableHelper.createStmtCreate(MIGRATION_TABLE));
+
+        //move to new table(with conversion)
+        db.execSQL("INSERT INTO "+MIGRATION_TABLE+" SELECT "+MoodTableHelper.COL_ID+","+MoodTableHelper.COL_TIMESTAMP+","+MoodTableHelper.COL_MOOD+","+MoodTableHelper.COL_SCOPE+" FROM "+MoodTableHelper.TABLE_NAME);
+        //drop old table
+        db.execSQL(createDropStatement(MoodTableHelper.TABLE_NAME));
+
+        //rename new table
+        db.execSQL(createRenameStatement(MIGRATION_TABLE, MoodTableHelper.TABLE_NAME));
+    }
+
+    /**
+     * Adds a new column to the mood table to allow avg values.
      * @param db
      */
     private void addScopeColumn(SQLiteDatabase db) {

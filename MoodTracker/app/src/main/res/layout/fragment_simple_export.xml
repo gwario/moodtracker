@@ -1,0 +1,35 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="at.ameise.moodtracker.fragment.SimpleImportExportFragment">
+
+
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:weightSum="10"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <EditText
+            android:id="@+id/fragment_simple_export_etData"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="10"
+            android:gravity="start"
+            android:scrollbars="horizontal|vertical"
+            android:inputType="text"
+            android:editable="false"
+            android:selectAllOnFocus="true"/>
+
+        <Button
+            android:id="@+id/fragment_simple_export_bCopy"
+            android:text="Copy data"
+            android:layout_weight="0"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+</FrameLayout>

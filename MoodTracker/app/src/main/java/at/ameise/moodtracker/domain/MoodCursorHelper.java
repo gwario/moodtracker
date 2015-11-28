@@ -1,11 +1,11 @@
 package at.ameise.moodtracker.domain;
 
-import android.content.ContentProviderOperation;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 
@@ -66,6 +66,15 @@ public final class MoodCursorHelper {
     }
 
     /**
+     * @param context   the context
+     * @return a {@link android.content.CursorLoader} on all {@link at.ameise.moodtracker.domain.Mood}s. Uses {@link at.ameise.moodtracker.domain.MoodTableHelper#SORT_ORDER_TIMESTAMP_ASC}.
+     */
+    public static Loader<Cursor> getAllMoodsCursorLoader(Context context) {
+
+        return new CursorLoader(context, MoodContentProvider.CONTENT_URI_MOOD, MoodTableHelper.ALL_COLUMNS, null, null, MoodTableHelper.SORT_ORDER_TIMESTAMP_ASC);
+    }
+
+    /**
      * Creates the given {@link at.ameise.moodtracker.domain.Mood} in the database.<br>
      * <br>
      * Note: This method does not check if the course does already exist!
@@ -79,6 +88,10 @@ public final class MoodCursorHelper {
 
         final Uri returnUri = context.getContentResolver().insert(MoodContentProvider.CONTENT_URI_MOOD, values);
         final long id = Long.parseLong(returnUri.getLastPathSegment());
+
+        if(id == -1)
+            throw new SQLException("Failed to create "+mood.toString());
+
         mood.setId(id);
     }
 

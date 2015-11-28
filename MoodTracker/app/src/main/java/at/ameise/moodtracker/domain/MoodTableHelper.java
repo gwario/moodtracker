@@ -3,6 +3,10 @@ package at.ameise.moodtracker.domain;
 import android.content.ContentValues;
 import android.database.Cursor;
 
+import java.util.Arrays;
+
+import at.ameise.moodtracker.util.Logger;
+
 /**
  * Contains all information necessary to understand the data contained in the mood table.
  *
@@ -10,18 +14,19 @@ import android.database.Cursor;
  */
 public class MoodTableHelper {
 
-    static final String TABLE_NAME = "mood";
+    private static final String TAG = "MoodTableHelper";
 
+    static final String TABLE_NAME = "mood";
     static final String COL_ID = "_id";
     static final String COL_MOOD = "mood";
     static final String COL_TIMESTAMP = "timestamp";
+
     static final String COL_SCOPE = "scope";
 
     public static final String[] ALL_COLUMNS = { COL_ID, COL_MOOD, COL_TIMESTAMP, COL_SCOPE };
-
     public static final String SORT_ORDER_TIMESTAMP_DESC = COL_TIMESTAMP + " desc";
-    public static final String SORT_ORDER_TIMESTAMP_ASC = COL_TIMESTAMP + " asc";
 
+    public static final String SORT_ORDER_TIMESTAMP_ASC = COL_TIMESTAMP + " asc";
     static final String STMT_CREATE = createStmtCreate(TABLE_NAME);
 
     /**
@@ -46,6 +51,8 @@ public class MoodTableHelper {
 
         final ContentValues values = new ContentValues();
 
+        if(mood.getId() != null)
+            values.put(COL_ID, mood.getId());
         values.put(COL_MOOD, mood.getMood());
         values.put(COL_TIMESTAMP, mood.getDateInSeconds());
         values.put(COL_SCOPE, mood.getScope().getColumnValue());
@@ -65,6 +72,42 @@ public class MoodTableHelper {
         mood.setMood(cursor.getFloat(cursor.getColumnIndexOrThrow(MoodTableHelper.COL_MOOD)));
         mood.setScope(EMoodScope.fromColumnValue(cursor.getString(cursor.getColumnIndexOrThrow(MoodTableHelper.COL_SCOPE))));
         mood.setDate(cursor.getLong(cursor.getColumnIndexOrThrow(MoodTableHelper.COL_TIMESTAMP)));
+
+        return mood;
+    }
+
+    /**
+     * @param cursor    cursor pointing to a row
+     * @return the cells(number id,number mood,string scope,string timestamp) of this row as csv. Separator is , and string delimiter is '.
+     */
+    public static String csvFromCursor(Cursor cursor) {
+
+        StringBuilder csvRow = new StringBuilder();
+
+        csvRow.append(cursor.getLong(cursor.getColumnIndexOrThrow(MoodTableHelper.COL_ID))).append(",");
+        csvRow.append(cursor.getFloat(cursor.getColumnIndexOrThrow(MoodTableHelper.COL_MOOD))).append(",");
+        csvRow.append("'").append(EMoodScope.fromColumnValue(cursor.getString(cursor.getColumnIndexOrThrow(MoodTableHelper.COL_SCOPE)))).append("',");
+        csvRow.append("'").append(cursor.getLong(cursor.getColumnIndexOrThrow(MoodTableHelper.COL_TIMESTAMP))).append("'");
+
+        return csvRow.toString();
+    }
+
+    public static Mood fromCsv(String csvRow) {
+
+        Mood mood = null;
+
+        String[] cells = csvRow.split(",(?=([^']*'[^']*')*[^']*$)");
+
+        cells[2] = cells[2].substring(1, cells[2].length()-1);
+        cells[3] = cells[3].substring(1, cells[3].length()-1);
+
+        Logger.verbose(TAG, "Cells: "+ Arrays.toString(cells));
+
+        mood = new Mood();
+        mood.setId(Long.valueOf(cells[0]));
+        mood.setMood(Float.valueOf(cells[1]));
+        mood.setScope(EMoodScope.fromColumnValue(cells[2]));
+        mood.setDate(Long.valueOf(cells[3]));
 
         return mood;
     }

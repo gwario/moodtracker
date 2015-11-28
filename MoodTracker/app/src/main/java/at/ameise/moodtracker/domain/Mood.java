@@ -36,6 +36,7 @@ public class Mood {
     @Override
     public String toString() {
         return "Mood {" +
+                "id=" + id + ", " +
                 "mood=" + mood + ", " +
                 "date=" + ISetting.DEBUG_DATE_FORMAT.format(date.getTime()) + ", " +
                 "scope=" + scope +

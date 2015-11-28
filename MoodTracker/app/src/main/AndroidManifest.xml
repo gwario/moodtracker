@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="at.ameise.moodtracker" >
+    package="at.ameise.moodtracker">
 
     <permission android:name="RECEIVE_BOOT_COMPLETED" />
 
     <application
+        android:name=".MoodTrackerApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:name=".MoodTrackerApplication"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <activity
             android:name=".activity.MainActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -24,12 +24,11 @@
             android:name=".domain.MoodContentProvider"
             android:authorities="at.ameise.moodtracker.contentprovider"
             android:enabled="true"
-            android:exported="true" >
-        </provider>
+            android:exported="true"></provider>
 
         <receiver
             android:name=".widget.EnterMoodWidget"
-            android:label="MoodTracker entry widget" >
+            android:label="MoodTracker entry widget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -41,23 +40,24 @@
 
         <service
             android:name=".service.AverageCalculatorService"
-            android:exported="false" >
-        </service>
+            android:exported="false"></service>
 
         <receiver
             android:name=".receiver.BootCompletedReceiver"
             android:enabled="true"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-
         <receiver
             android:name=".receiver.QuarterDailyReceiver"
             android:enabled="true"
-            android:exported="false" >
-        </receiver>
+            android:exported="false"></receiver>
+
+        <activity
+            android:name=".activity.SimpleImportExportActivity"
+            android:label="@string/title_activity_simple_import_export"></activity>
     </application>
 
 </manifest>

@@ -2,6 +2,7 @@ package at.ameise.moodtracker.fragment;
 
 import android.app.Fragment;
 import android.app.LoaderManager;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -25,6 +26,7 @@ import at.ameise.moodtracker.ILoader;
 import at.ameise.moodtracker.ISetting;
 import at.ameise.moodtracker.ITag;
 import at.ameise.moodtracker.R;
+import at.ameise.moodtracker.activity.SimpleImportExportActivity;
 import at.ameise.moodtracker.domain.Mood;
 import at.ameise.moodtracker.domain.MoodCursorHelper;
 import at.ameise.moodtracker.domain.MoodTableHelper;
@@ -180,6 +182,14 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
                 } else {
                     Toast.makeText(getActivity(), R.string.message_still_loading, Toast.LENGTH_SHORT).show();
                 }
+                return true;
+
+            case R.id.menu_item_export:
+                startActivity(new Intent().putExtra(SimpleImportExportActivity.EXTRA_IMPORT, false).setClass(getActivity(), SimpleImportExportActivity.class));
+                return true;
+
+            case R.id.menu_item_import:
+                startActivity(new Intent().putExtra(SimpleImportExportActivity.EXTRA_IMPORT, true).setClass(getActivity(), SimpleImportExportActivity.class));
                 return true;
 
             default:
