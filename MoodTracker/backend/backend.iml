@@ -6,7 +6,6 @@
         <option name="GRADLE_PROJECT_PATH" value=":backend" />
       </configuration>
     </facet>
-<<<<<<< HEAD
     <facet type="java-gradle" name="Java-Gradle">
       <configuration>
         <option name="BUILD_FOLDER_PATH" value="$MODULE_DIR$/build" />
@@ -17,7 +16,6 @@
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_7" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$">
-=======
     <facet type="app-engine-gradle" name="App Engine Gradle">
       <configuration>
         <option name="HTTP_ADDRESS" value="localhost" />
@@ -47,14 +45,11 @@
       <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/resources" type="java-test-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/functionalTest/resources" type="java-test-resource" />
->>>>>>> #18 add backend and app interface(code from sample project)
       <excludeFolder url="file://$MODULE_DIR$/.gradle" />
       <excludeFolder url="file://$MODULE_DIR$/build" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-<<<<<<< HEAD
-=======
     <orderEntry type="library" exported="" name="appengine-endpoints-1.9.28" level="project" />
     <orderEntry type="library" exported="" name="appengine-endpoints-deps-1.9.28" level="project" />
     <orderEntry type="library" exported="" name="servlet-api-2.5" level="project" />
@@ -64,6 +59,5 @@
     <orderEntry type="library" exported="" name="guava-18.0" level="project" />
     <orderEntry type="library" exported="" name="json-simple-1.1" level="project" />
     <orderEntry type="library" exported="" name="backend.backend-android-endpoints" level="project" />
->>>>>>> #18 add backend and app interface(code from sample project)
   </component>
 </module>
