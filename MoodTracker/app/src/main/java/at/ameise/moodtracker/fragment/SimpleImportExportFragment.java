@@ -3,12 +3,15 @@ package at.ameise.moodtracker.fragment;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.LoaderManager;
+import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Loader;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,6 +46,9 @@ public class SimpleImportExportFragment extends Fragment implements View.OnClick
     private Button bImport;
     private Button bCopy;
     private Button bPaste;
+    private ProgressDialog progressDialog;
+
+    private static Handler handler;
 
     private OnFragmentInteractionListener mListener;
 
@@ -164,16 +170,22 @@ public class SimpleImportExportFragment extends Fragment implements View.OnClick
 
                 try {
 
-                    String databaseCsv = etData.getText().toString();
+                    new ImportCsvAsyncTask(getActivity()) {
+                        @Override
+                        public void onImported(int importCnt, int recordCnt) {
 
-                    importDatabaseCsv(databaseCsv);
+                            int failedCnt = recordCnt - importedCnt;
 
-                    Toast.makeText(getActivity(), "Import successful.", Toast.LENGTH_SHORT).show();
+                            Logger.info(TAG, "Imported " + importedCnt + " mood records"+(failedCnt > 0?" (" + failedCnt + " failed).":"."));
 
-                    getActivity().finish();
+                            Toast.makeText(SimpleImportExportFragment.this.getActivity(), "Imported " + importedCnt + " mood records"+(failedCnt > 0?" (" + failedCnt + " failed).":"."), Toast.LENGTH_SHORT).show();
 
-                    if(mListener != null)
-                        mListener.onImportSuccess();
+                            getActivity().finish();
+
+                            if(mListener != null)
+                                mListener.onImportSuccess();
+                        }
+                    }.execute(etData.getText().toString());
 
                 } catch (Exception e) {
 
@@ -185,63 +197,6 @@ public class SimpleImportExportFragment extends Fragment implements View.OnClick
             default:
                 throw new IllegalArgumentException("Button action not implemented!");
         }
-
-    }
-
-    /**
-     * Imports the csv data.
-     * @param databaseCsv the data
-     */
-    private void importDatabaseCsv(String databaseCsv) {
-
-        long imported = 0;
-        long failed = 0;
-
-        String[] rows = databaseCsv.split("\n");
-
-        for(int i = 0; i < rows.length; i++) {
-
-            try {
-
-                String row = rows[i];
-
-                Mood mood = MoodTableHelper.fromCsv(row);
-                Logger.verbose(TAG, mood.toString());
-
-                MoodCursorHelper.createMood(getActivity(), mood);
-
-                imported++;
-
-            } catch (Exception e) {
-                failed++;
-                Logger.verbose(TAG, "Failed to import mood!");
-            }
-        }
-
-        Logger.info(TAG, "Imported "+imported+" moods ("+failed+" failed).");
-    }
-
-    /**
-     * Returns the whole mood database as csv.
-     * @return the whole mood database as csv
-     * @param cursor
-     */
-    private CharSequence exportDatabaseCsv(Cursor cursor) {
-
-        StringBuilder csvData = new StringBuilder();
-
-        if (cursor.moveToFirst()) {
-            do {
-
-                csvData.append(MoodTableHelper.csvFromCursor(cursor));
-
-                if(!cursor.isLast())
-                    csvData.append("\n");
-
-            } while (cursor.moveToNext());
-        }
-
-        return csvData.toString();
     }
 
     @Override
@@ -270,11 +225,22 @@ public class SimpleImportExportFragment extends Fragment implements View.OnClick
 
             try {
 
-                etData.setText(exportDatabaseCsv(cursor));
+                new ExportCsvAsyncTask(getActivity()) {
+                    @Override
+                    public void onExported(String cvsData, int exportCnt, int recordCnt) {
 
-                if(mListener != null) {
-                    mListener.onExportSuccess();
-                }
+                        etData.setText(cvsData);
+
+                        int failedCnt = recordCnt - exportCnt;
+
+                        Logger.info(TAG, "Exported " + exportCnt + " mood records" + (failedCnt > 0 ? " (" + failedCnt + " failed).":"."));
+
+                        Toast.makeText(SimpleImportExportFragment.this.getActivity(), "Exported " + exportCnt + " mood records" + (failedCnt > 0 ? " (" + failedCnt + " failed)." : "."), Toast.LENGTH_SHORT).show();
+
+                        if(mListener != null)
+                            mListener.onExportSuccess();
+                    }
+                }.execute(cursor);
 
             } catch (Exception e) {
 
@@ -287,6 +253,176 @@ public class SimpleImportExportFragment extends Fragment implements View.OnClick
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {}
+
+
+    /**
+     * Imports the csv data.
+     */
+    private abstract class ImportCsvAsyncTask extends AsyncTask<String, Integer, Void> {
+
+        private ProgressDialog progressDialog;
+
+        int importedCnt = -1;
+        int recordCnt = -1;
+
+        public ImportCsvAsyncTask(Activity activity) {
+            progressDialog = new ProgressDialog(activity);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog.setCanceledOnTouchOutside(false);
+            progressDialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(String... databaseCsv) {
+
+            if (databaseCsv.length != 1) throw new AssertionError();
+
+            String[] rows = databaseCsv[0].split("\n");
+
+            recordCnt = rows.length;
+            importedCnt = 0;
+
+            int onePercentCnt = recordCnt / 100;
+
+            for(int iRecord = 0; iRecord < recordCnt; iRecord++) {
+
+                try {
+
+                    publishProgress(iRecord / onePercentCnt);
+
+                    String row = rows[iRecord];
+
+                    Mood mood = MoodTableHelper.fromCsv(row);
+                    Logger.verbose(TAG, mood.toString());
+
+                    MoodCursorHelper.createMood(getActivity(), mood);
+
+                    importedCnt++;
+
+                } catch (Exception e) {
+                    Logger.verbose(TAG, "Failed to import record!");
+                }
+            }
+
+            publishProgress(100);
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
+
+            progressDialog.setMessage("Importing... (" + importedCnt + " of " +recordCnt+")");
+            progressDialog.setProgress(values[0]);
+        }
+
+        protected void onPostExecute(Void result) {
+
+            progressDialog.dismiss();
+
+            onImported(importedCnt, recordCnt);
+
+            super.onPostExecute(result);
+        }
+
+        /**
+         * Called when all records are imported.
+         * @param importCnt the number of actually imported records.
+         * @param recordCnt
+         */
+        public abstract void onImported(int importCnt, int recordCnt);
+    }
+
+    /**
+     * Exports the data as csv.
+     */
+    private abstract class ExportCsvAsyncTask extends AsyncTask<Cursor, Integer, String> {
+
+        private ProgressDialog progressDialog;
+
+        int exportedCnt = -1;
+        int recordCnt = -1;
+
+        public ExportCsvAsyncTask(Activity activity) {
+            progressDialog = new ProgressDialog(activity);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog.setCanceledOnTouchOutside(false);
+            progressDialog.show();
+        }
+
+        @Override
+        protected String doInBackground(Cursor... databaseCursor) {
+
+            if (databaseCursor.length != 1) throw new AssertionError();
+
+            StringBuilder csvData = new StringBuilder();
+            Cursor cursor = databaseCursor[0];
+
+            recordCnt = cursor.getCount();
+            exportedCnt = 0;
+
+            int onePercentCnt = recordCnt / 100;
+
+            if (cursor.moveToFirst()) {
+                do {
+
+                    try {
+
+                        publishProgress(exportedCnt / onePercentCnt);
+
+                        exportedCnt++;
+
+                        csvData.append(MoodTableHelper.csvFromCursor(cursor));
+
+                        if(!cursor.isLast())
+                            csvData.append("\n");
+
+                    } catch (Exception e) {
+                        Logger.verbose(TAG, "Failed to export record!");
+                    }
+
+                } while (cursor.moveToNext());
+            }
+
+            publishProgress(100);
+
+            return csvData.toString();
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
+
+            progressDialog.setMessage("Exporting... (" + exportedCnt + " of " +recordCnt+")");
+            progressDialog.setProgress(values[0]);
+        }
+
+        protected void onPostExecute(String cvsData) {
+
+            progressDialog.dismiss();
+
+            onExported(cvsData, exportedCnt, recordCnt);
+
+            super.onPostExecute(cvsData);
+        }
+
+        /**
+         * Called when all records are exported.
+         * @param cvsData the exported csv.
+         * @param exportCnt the number of actually imported records.
+         * @param recordCnt the number of records.
+         */
+        public abstract void onExported(String cvsData, int exportCnt, int recordCnt);
+    }
+
 
     /**
      * This interface must be implemented by activities that contain this

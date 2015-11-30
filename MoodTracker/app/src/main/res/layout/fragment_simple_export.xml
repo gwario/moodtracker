@@ -4,8 +4,6 @@
     android:layout_height="match_parent"
     tools:context="at.ameise.moodtracker.fragment.SimpleImportExportFragment">
 
-
-
     <LinearLayout
         android:orientation="vertical"
         android:weightSum="10"
