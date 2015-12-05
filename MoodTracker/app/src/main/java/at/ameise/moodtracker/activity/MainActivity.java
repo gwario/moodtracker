@@ -7,6 +7,9 @@ import android.os.Bundle;
 import android.view.Window;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+
 import java.io.IOException;
 
 import at.ameise.moodtracker.IPreference;

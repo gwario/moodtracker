@@ -2,7 +2,6 @@ package at.ameise.moodtracker.fragment;
 
 import android.app.Fragment;
 import android.app.LoaderManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
@@ -25,12 +24,11 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import at.ameise.moodtracker.ILoader;
-import at.ameise.moodtracker.IPreference;
 import at.ameise.moodtracker.ISetting;
 import at.ameise.moodtracker.ITag;
 import at.ameise.moodtracker.R;
-import at.ameise.moodtracker.activity.SimpleImportExportActivity;
 import at.ameise.moodtracker.activity.SignInActivity;
+import at.ameise.moodtracker.activity.SimpleImportExportActivity;
 import at.ameise.moodtracker.domain.Mood;
 import at.ameise.moodtracker.domain.MoodCursorHelper;
 import at.ameise.moodtracker.domain.MoodTableHelper;
