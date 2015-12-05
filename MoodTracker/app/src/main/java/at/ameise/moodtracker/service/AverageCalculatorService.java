@@ -7,6 +7,7 @@ import android.content.Intent;
 import at.ameise.moodtracker.ITag;
 import at.ameise.moodtracker.domain.AverageCalculatorHelper;
 import at.ameise.moodtracker.domain.MoodTableHelper;
+import at.ameise.moodtracker.util.IntentUtil;
 import at.ameise.moodtracker.util.Logger;
 
 /**
@@ -56,14 +57,9 @@ public class AverageCalculatorService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
 
-        if (intent != null) {
+        if (IntentUtil.hasAction(intent, ACTION_CALCULATE_AVERAGE)) {
 
-            final String action = intent.getAction();
-
-            if (ACTION_CALCULATE_AVERAGE.equals(action)) {
-
-                handleActionCalculateAverage(intent);
-            }
+            handleActionCalculateAverage(intent);
         }
     }
 

@@ -17,11 +17,13 @@
 package at.ameise.moodtracker.utils;
 
 import com.google.appengine.repackaged.org.joda.time.DateTime;
+import com.googlecode.objectify.Ref;
 
 import java.util.List;
 import java.util.logging.Logger;
 
 import at.ameise.moodtracker.models.Mood;
+import at.ameise.moodtracker.models.UserAccount;
 
 import static at.ameise.moodtracker.OfyService.ofy;
 
@@ -36,29 +38,32 @@ public final class MoodUtil {
 
     /**
      * Retrieves the list of moods of a given user.
-     * @param userEmail The email address of the user.
+     * @param userAccount The account of the user.
      * @return List of all matching {@link Mood} entities.
      */
     @SuppressWarnings({"cast", "unchecked"})
-    public static List<Mood> getMoodsOfUser(final String userEmail) {
+    public static List<Mood> getMoodsOfUser(final UserAccount userAccount) {
 
-        LOG.info("list moods for user = " + userEmail);
+        LOG.info("list moods for user = " + userAccount.getEmail());
 
-        return ofy().load().type(Mood.class).list();
+        return ofy().load().type(Mood.class)
+                .ancestor(userAccount)
+                .list();
     }
 
     /**
      * Retrieves the list of moods of a given user.
-     * @param userEmail The email address of the user.
-     * @return List of all matching {@link Mood} entities.
+     * @param userAccount The account of the user.
+     * @return List of all {@link Mood} entities which have {@link Mood#getTimestamp()} after afterDateTime.
      */
     @SuppressWarnings({"cast", "unchecked"})
-    public static List<Mood> getMoodsOfUserAfter(final String userEmail, final DateTime afterDateTime) {
+    public static List<Mood> getMoodsOfUserAfter(final UserAccount userAccount, final DateTime afterDateTime) {
 
-        LOG.info("list moods for user = " + userEmail +" after "+ afterDateTime);
+        LOG.info("list moods for user = " + userAccount.getEmail() + " after " + afterDateTime);
 
         return ofy().load().type(Mood.class)
-                .filter("timestamp >", afterDateTime.getMillis())
+                .ancestor(userAccount)
+                .filter("timestampMs >", afterDateTime.getMillis())
                 .list();
     }
 }

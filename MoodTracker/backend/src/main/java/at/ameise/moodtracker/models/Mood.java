@@ -2,6 +2,7 @@ package at.ameise.moodtracker.models;
 
 import com.google.api.server.spi.config.AnnotationBoolean;
 import com.google.api.server.spi.config.ApiResourceProperty;
+import com.google.appengine.repackaged.org.joda.time.DateTime;
 import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
@@ -64,6 +65,10 @@ public class Mood {
 
     public final long getTimestamp() {
         return this.timestampMs;
+    }
+
+    public final DateTime getDateTime() {
+        return new DateTime(this.timestampMs);
     }
 
     public final void setTimestamp(final long timestampMs) {

@@ -24,12 +24,14 @@ import com.google.api.server.spi.config.ApiNamespace;
 import com.google.api.server.spi.config.Named;
 import com.google.api.server.spi.response.UnauthorizedException;
 import com.google.appengine.api.users.User;
+import com.google.appengine.repackaged.org.joda.time.DateTime;
 import com.googlecode.objectify.Ref;
 
 import at.ameise.moodtracker.IApiConstants;
 import at.ameise.moodtracker.models.Mood;
 import at.ameise.moodtracker.models.UserAccount;
 import at.ameise.moodtracker.utils.EndpointUtil;
+import at.ameise.moodtracker.utils.MoodUtil;
 import at.ameise.moodtracker.utils.UserAccountUtil;
 
 import java.util.Date;
@@ -75,6 +77,50 @@ public class MoodEndpoint {
         LOG.info("Returning all moods of "+user.getEmail());
         LOG.fine("Returning all " + moodList.size() + " moods of " + user.getEmail());
         return moodList;
+    }
+
+    /**
+     * Lists all the entities inserted in datastore since a certain point in time(exclusive).
+     * @param user the user requesting the entities.
+     * @return List of all entities persisted.
+     * @throws com.google.api.server.spi.ServiceException if user is not authorized
+     */
+    @ApiMethod(httpMethod = "GET", path = "since")
+    public final List<Mood> listMoodsSince(final User user, DateTime since) throws ServiceException {
+        EndpointUtil.throwIfNotAuthenticated(user);
+
+        UserAccount userAccount = UserAccountUtil.getUser(user.getEmail());
+
+        List<Mood> moodList = MoodUtil.getMoodsOfUserAfter(userAccount, since);
+
+        LOG.info("Returning all moods of "+user.getEmail()+" since "+since.toString());
+        LOG.fine("Returning all " + moodList.size() + " moods of " + user.getEmail()+" since "+since.toString());
+        return moodList;
+    }
+
+    /**
+     * Returns the most recent entity.
+     * @param user the user requesting the entities.
+     * @return The most recent entity or null if there aren't any moods yet.
+     * @throws com.google.api.server.spi.ServiceException if user is not authorized
+     */
+    @ApiMethod(httpMethod = "GET", path = "mostRecent")
+    public final Mood getMostRecentMood(final User user) throws ServiceException {
+        EndpointUtil.throwIfNotAuthenticated(user);
+
+        UserAccount userAccount = UserAccountUtil.getUser(user.getEmail());
+
+        List<Mood> moodList = ofy().load().type(Mood.class).ancestor(userAccount).order("-timestampMs").limit(1).list();
+
+        Mood mostRecentMood = null;
+        if(moodList.size() == 1) {
+
+            mostRecentMood = moodList.get(0);
+        }
+
+        LOG.info("Returning the most recent mood of "+user.getEmail());
+        LOG.fine("Returning the most recent mood of " + user.getEmail()+"(from "+(mostRecentMood != null?mostRecentMood.getDateTime(): null)+")");
+        return mostRecentMood;
     }
 
     /**

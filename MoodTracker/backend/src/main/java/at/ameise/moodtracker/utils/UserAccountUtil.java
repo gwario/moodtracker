@@ -23,7 +23,10 @@ public final class UserAccountUtil {
      */
     public static UserAccount getUser(final String userEmail) {
 
-        List<UserAccount> userAccounts = ofy().load().type(UserAccount.class).filter("email =", userEmail).limit(1).list();
+        List<UserAccount> userAccounts = ofy().load().type(UserAccount.class)
+                .filter("email =", userEmail)
+                .limit(1)
+                .list();
 
         if(userAccounts.size() < 1) {
 
