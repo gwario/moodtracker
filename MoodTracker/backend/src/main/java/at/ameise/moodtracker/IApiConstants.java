@@ -23,7 +23,7 @@ package at.ameise.moodtracker;
  * Please refer to the documentation for this sample for more details.
  */
 public interface IApiConstants {
-    
+
     /** Android client ID from Google Cloud console. */
     String ANDROID_CLIENT_ID = "1008624441817-pfdk2u7462bgnckai1p7u395tsnegl7n.apps.googleusercontent.com";
 

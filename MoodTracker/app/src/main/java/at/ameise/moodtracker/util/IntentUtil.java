@@ -14,7 +14,7 @@ public class IntentUtil {
     /**
      * @param intent
      * @param extraName
-     * @return true if the intent got the extra.
+     * @return true if the intent got the extra. Does check for null values.
      */
     public static boolean hasExtra(Intent intent, String extraName) {
 
@@ -23,8 +23,19 @@ public class IntentUtil {
 
     /**
      * @param intent
+     * @param actionName
+     * @return true if the intent got the action. Does check for null values.
+     */
+    public static boolean hasAction(Intent intent, String actionName) {
+
+        return intent != null && intent.getAction() != null && intent.getAction().equals(actionName);
+    }
+
+    /**
+     * @param intent
      * @param extraName
      * @return true returns the boolean extra of the intent or false if it does not exist.
+     * Does check for null values.
      */
     public static boolean getBooleanExtra(Intent intent, String extraName) {
 
