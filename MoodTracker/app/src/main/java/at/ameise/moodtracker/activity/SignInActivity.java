@@ -151,7 +151,6 @@ public class SignInActivity extends Activity implements DialogInterface.OnClickL
                     Logger.info(TAG, "Account picker canceled by user!");
                     cancelSignIn();
                 }
-
                 break;
         }
     }

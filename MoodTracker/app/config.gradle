@@ -27,7 +27,7 @@ android {
          * "http://10.0.2.2:8080/_ah/api/"
          */
         buildConfigField "String", "ROOT_URL",  "\"https://grounded-braid-114120.appspot.com/_ah/api/\""
-        // The IP ADDRESS of your SERVER. Yours may be different.
+        //buildConfigField "String", "ROOT_URL",  "\"http://10.0.2.2:8080/_ah/api/\""
 
         /**
          * Substitute you own sender ID here. This is the project number you got

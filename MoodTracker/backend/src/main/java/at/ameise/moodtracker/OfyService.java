@@ -16,12 +16,12 @@
 
 package at.ameise.moodtracker;
 
-import at.ameise.moodtracker.models.Mood;
-import at.ameise.moodtracker.models.UserAccount;
-
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
+
+import at.ameise.moodtracker.models.Mood;
+import at.ameise.moodtracker.models.UserAccount;
 
 /**
  * Objectify service wrapper so we can statically register our persistence
