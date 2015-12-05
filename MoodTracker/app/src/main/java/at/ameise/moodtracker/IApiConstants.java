@@ -1,7 +1,5 @@
 package at.ameise.moodtracker;
 
-import at.ameise.moodtracker.BuildConfig;
-
 /**
  * API Keys, Client Ids and Audience Ids for accessing APIs and configuring
  * Cloud Endpoints. When you deploy your solution, you need to use your own API
@@ -30,9 +28,4 @@ public interface IApiConstants {
      * "http://10.0.2.2:8080/_ah/api/"
      */
     String ROOT_URL = BuildConfig.ROOT_URL;
-
-    /**
-     * Defines whether authentication is required or not.
-     */
-    boolean SIGN_IN_REQUIRED = BuildConfig.SIGN_IN_REQUIRED;
 }

@@ -15,7 +15,7 @@ import at.ameise.moodtracker.domain.Mood;
 
 /**
  * Contains methods to share mood.
- * Created by Mario Gastegger <mgastegger AT buzzmark DOT com> on 21.03.15.
+ * Created by Mario Gastegger <mario DOT gastegger AT gmail DOT com> on 21.03.15.
  */
 public class ShareUtil {
 

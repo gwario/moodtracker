@@ -7,7 +7,7 @@ import java.text.DecimalFormat;
 /**
  * The default value formatter for Y values in {@link at.ameise.moodtracker.fragment.MoodHistoryFragment}
  *
- * Created by Mario Gastegger <mgastegger AT buzzmark DOT com> on 06.04.15.
+ * Created by Mario Gastegger <mario DOT gastegger AT gmail DOT com> on 06.04.15.
  */
 public class DefaultValueFormatter implements ValueFormatter {
 

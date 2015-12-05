@@ -10,6 +10,9 @@ import at.ameise.moodtracker.util.Logger;
 /**
  * Contains all information necessary to understand the data contained in the mood table.
  *
+ * TODO refactor to use number column for timestamp
+ * TODO on migration: delete all non raw values and let the avg calculator recalculate them
+ *
  * Created by Mario Gastegger <mario DOT gastegger AT gmail DOT com> on 14.02.15.
  */
 public class MoodTableHelper {
@@ -37,7 +40,7 @@ public class MoodTableHelper {
 
         return "CREATE TABLE IF NOT EXISTS " + tableName + "("
                 + COL_ID +" INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + COL_TIMESTAMP +" TEXT NOT NULL UNIQUE ON CONFLICT REPLACE,"
+                + COL_TIMESTAMP +" INTEGER NOT NULL UNIQUE ON CONFLICT REPLACE,"
                 + COL_MOOD +" REAL NOT NULL,"
                 + COL_SCOPE + " TEXT NOT NULL DEFAULT '"+EMoodScope.RAW.getColumnValue()+"'"
                 +")";
@@ -54,7 +57,7 @@ public class MoodTableHelper {
         if(mood.getId() != null)
             values.put(COL_ID, mood.getId());
         values.put(COL_MOOD, mood.getMood());
-        values.put(COL_TIMESTAMP, mood.getDateInSeconds());
+        values.put(COL_TIMESTAMP, mood.getTimestamp().getMillis());
         values.put(COL_SCOPE, mood.getScope().getColumnValue());
 
         return values;
@@ -71,7 +74,7 @@ public class MoodTableHelper {
         mood.setId(cursor.getLong(cursor.getColumnIndexOrThrow(MoodTableHelper.COL_ID)));
         mood.setMood(cursor.getFloat(cursor.getColumnIndexOrThrow(MoodTableHelper.COL_MOOD)));
         mood.setScope(EMoodScope.fromColumnValue(cursor.getString(cursor.getColumnIndexOrThrow(MoodTableHelper.COL_SCOPE))));
-        mood.setDate(cursor.getLong(cursor.getColumnIndexOrThrow(MoodTableHelper.COL_TIMESTAMP)));
+        mood.setTimestamp(cursor.getLong(cursor.getColumnIndexOrThrow(MoodTableHelper.COL_TIMESTAMP)));
 
         return mood;
     }
@@ -107,7 +110,7 @@ public class MoodTableHelper {
         mood.setId(Long.valueOf(cells[0]));
         mood.setMood(Float.valueOf(cells[1]));
         mood.setScope(EMoodScope.fromColumnValue(cells[2]));
-        mood.setDate(Long.valueOf(cells[3]));
+        mood.setTimestamp(Long.valueOf(cells[3]));
 
         return mood;
     }

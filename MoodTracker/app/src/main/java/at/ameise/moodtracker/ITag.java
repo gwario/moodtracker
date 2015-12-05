@@ -3,7 +3,7 @@ package at.ameise.moodtracker;
 /**
  * Contains all class spanning tags.
  *
- * Created by Mario Gastegger <mgastegger AT buzzmark DOT com> on 03.03.15.
+ * Created by Mario Gastegger <mario DOT gastegger AT gmail DOT com> on 03.03.15.
  */
 public interface ITag {
 

@@ -12,6 +12,7 @@
     <string name="options_menu_import">import</string>
 
     <string name="options_menu_share">Share</string>
+    <string name="options_menu_signIn">Sign In</string>
     <string name="options_menu_signOut">Sign Out</string>
 
     <string name="share_chooser_text">Share most recent mood...</string>

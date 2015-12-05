@@ -24,11 +24,7 @@
         <init-param>
             <param-name>services</param-name>
             <param-value>
-                at.ameise.moodtracker.apis.SynchronizationEndpoint,
-                at.ameise.moodtracker.apis.RecommendationEndpoint,
-                at.ameise.moodtracker.apis.RegistrationEndpoint,
-                at.ameise.moodtracker.apis.MessagingEndpoint
-
+                at.ameise.moodtracker.apis.MoodEndpoint
             </param-value>
         </init-param>
     </servlet>
@@ -48,13 +44,13 @@
     </servlet-mapping>
 
     <servlet>
-        <servlet-name>RecommendationServlet</servlet-name>
-        <servlet-class>at.ameise.moodtracker.apis.RecommendationServlet
+        <servlet-name>MoodServlet</servlet-name>
+        <servlet-class>at.ameise.moodtracker.apis.MoodServlet
         </servlet-class>
     </servlet>
     <servlet-mapping>
-        <servlet-name>RecommendationServlet</servlet-name>
-        <url-pattern>/tasks/recommendations</url-pattern>
+        <servlet-name>MoodServlet</servlet-name>
+        <url-pattern>/tasks/moods</url-pattern>
     </servlet-mapping>
 
     <servlet>

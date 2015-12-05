@@ -20,17 +20,15 @@ android {
     defaultConfig {
         // The following values should be changed by the user
 
+        buildConfigField "Integer", "BACKEND_CALL_TRIES",  "3"
+
         /**
          * The URL to the API. Default when running locally on your computer:
          * "http://10.0.2.2:8080/_ah/api/"
          */
         buildConfigField "String", "ROOT_URL",  "\"https://grounded-braid-114120.appspot.com/_ah/api/\""
-                // The IP ADDRESS of your SERVER. Yours may be different.
-        /**
-         * Defines whether authentication is required or not. Only works once
-         * deployed on production AppEngine, not on local server.
-         */
-        buildConfigField "boolean", "SIGN_IN_REQUIRED", "true"
+        // The IP ADDRESS of your SERVER. Yours may be different.
+
         /**
          * Substitute you own sender ID here. This is the project number you got
          * from the API Console, as described in "Getting Started."

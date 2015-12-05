@@ -5,12 +5,25 @@ package at.ameise.moodtracker;
  */
 public interface IPreference {
 
-    String APPLICATION_PREFERENCES = "applicationPreferences";
-
-    String KEY_APPLICATION_INITIALIZED = "extraInitialized";
+    /**
+     * Name of the application wide preferences.
+     */
+    String APPLICATION_PREFERENCES = "at.ameise.moodtracker.applicationPreferences";
 
     /**
-     * Name of the key for the shared preferences to access the current signed in account.
+     * To determine if the application has been started before.
      */
-    String KEY_ACCOUNT_NAME = "extraAccountName";
+    String KEY_FIRST_APPLICATION_START = "at.ameise.moodtracker.applicationPreferences.extraFirstStart";
+
+    /**
+     * Contains the users decision on whether or not to sign in.
+     */
+    String KEY_DO_SIGN_IN = "at.ameise.moodtracker.applicationPreferences.extraDoSignIn";
+
+    /**
+     * Contains the account with which the user wants to sign in.
+     */
+    String KEY_ACCOUNT_NAME = "at.ameise.moodtracker.applicationPreferences.extraAccountName";
+
+
 }

@@ -21,6 +21,8 @@ import at.ameise.moodtracker.util.ShareUtil;
 
 /**
  * Implementation of App Widget functionality.
+ *
+ * Created by Mario Gastegger <mario DOT gastegger AT gmail DOT com>.
  */
 public class EnterMoodWidget extends AppWidgetProvider {
 

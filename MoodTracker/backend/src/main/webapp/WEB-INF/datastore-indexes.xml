@@ -16,9 +16,4 @@
   -->
 
 <datastore-indexes autoGenerate="true">
-    <datastore-index ancestor="false" kind="CheckIn" source="manual">
-        <property name="placeId" direction="asc"/>
-        <property name="userEmail" direction="asc"/>
-        <property name="checkinDate" direction="asc"/>
-    </datastore-index>
 </datastore-indexes>

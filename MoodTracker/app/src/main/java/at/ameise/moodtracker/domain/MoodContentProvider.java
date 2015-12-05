@@ -13,6 +13,11 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashSet;
 
+/**
+ * Content provider for mood data.
+ *
+ * Created by Mario Gastegger <mario DOT gastegger AT gmail DOT com>.
+ */
 public class MoodContentProvider extends ContentProvider {
 
     // database

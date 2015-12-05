@@ -9,11 +9,16 @@ import at.ameise.moodtracker.R;
 import at.ameise.moodtracker.fragment.SimpleImportExportFragment;
 import at.ameise.moodtracker.util.Logger;
 
+/**
+ * Activity which allows import and export of mood data.
+ *
+ * Mario Gastegger <mario DOT gastegger AT gmail DOT com>
+ */
 public class SimpleImportExportActivity extends Activity implements SimpleImportExportFragment.OnFragmentInteractionListener {
 
     public static final String TAG = "SimpleIOActivity";
 
-    public static final String EXTRA_IMPORT = "extraImport";
+    public static final String EXTRA_IMPORT = "at.ameise.moodtracker extraImport";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
