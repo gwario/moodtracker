@@ -3,7 +3,7 @@ package at.ameise.moodtracker;
 /**
  * Contains all loader ids.
  *
- * Created by Mario Gastegger <mgastegger AT buzzmark DOT com> on 03.03.15.
+ * Created by Mario Gastegger <mario DOT gastegger AT gmail DOT com> on 03.03.15.
  */
 public interface ILoader {
 

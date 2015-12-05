@@ -24,6 +24,8 @@ import at.ameise.moodtracker.util.Logger;
  * A simple {@link Fragment} subclass.
  * Use the {@link EnterMoodFragment#newInstance} factory method to
  * create an instance of this fragment.
+ *
+ * Created by Mario Gastegger <mario DOT gastegger AT gmail DOT com>.
  */
 public class EnterMoodFragment extends Fragment implements SeekBar.OnSeekBarChangeListener, View.OnClickListener, View.OnTouchListener {
 

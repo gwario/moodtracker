@@ -33,6 +33,8 @@ import at.ameise.moodtracker.util.Logger;
  * to handle interaction events.
  * Use the {@link SimpleImportExportFragment#newInstance} factory method to
  * create an instance of this fragment.
+ *
+ * Created by Mario Gastegger <mario DOT gastegger AT gmail DOT com>
  */
 public class SimpleImportExportFragment extends Fragment implements View.OnClickListener, LoaderManager.LoaderCallbacks<Cursor> {
 

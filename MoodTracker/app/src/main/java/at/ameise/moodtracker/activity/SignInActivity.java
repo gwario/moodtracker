@@ -16,37 +16,47 @@
 
 package at.ameise.moodtracker.activity;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.games.multiplayer.InvitationRef;
-import com.google.api.client.googleapis.extensions.android.gms.auth
-        .GoogleAccountCredential;
-
 import android.accounts.AccountManager;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
+import android.widget.Toast;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 
 import at.ameise.moodtracker.IApiConstants;
 import at.ameise.moodtracker.IPreference;
 import at.ameise.moodtracker.R;
+import at.ameise.moodtracker.util.IntentUtil;
 import at.ameise.moodtracker.util.Logger;
 
 /**
  * Activity that allows the user to select the account they want to use to sign
  * in. The class also implements integration with Google Play Services and
  * Google Accounts.
+ *
+ * TODO reconsider and refactor the signin process and the double use of this activity.
+ * Modified by Mario Gastegger <mario DOT gastegger AT gmail DOT com>.
  */
-public class SignInActivity extends Activity {
+public class SignInActivity extends Activity implements DialogInterface.OnClickListener {
 
     public static final String TAG = SignInActivity.class.getSimpleName();
 
+    /**
+     * If this boolean extra is passed with an intent, this activity asks the user to sign in.
+     */
+    public static final String EXTRA_SIGN_IN = "at.ameise.moodtracker.activityMainActivity.extraSignIn";
 
     private static final int REQUEST_ACCOUNT_PICKER = 1;
     private static final int REQUEST_GOOGLE_PLAY_SERVICES = 2;
+
+    private SharedPreferences applicationPreferences;
 
     /**
      *  Google Account credentials manager.
@@ -61,70 +71,47 @@ public class SignInActivity extends Activity {
         return credential;
     }
 
-    /**
-     * Called to sign out the user, so user can later on select a different
-     * account.
-     *
-     * @param activity activity that initiated the sign out.
-     */
-    public static void onSignOut(final Activity activity) {
-
-        SharedPreferences settings = activity.getSharedPreferences(IPreference.APPLICATION_PREFERENCES, 0);
-
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putString(IPreference.KEY_ACCOUNT_NAME, "");
-
-        editor.apply();
-        credential.setSelectedAccountName("");
-
-        Intent intent = new Intent(activity, SignInActivity.class);
-        activity.startActivity(intent);
-    }
-
-    /**
-     * Initializes the activity content and then navigates to the MainActivity
-     * if the user is already signed in or if the app is configured to not
-     * require the sign in.
-     * Otherwise it initiates starting the UI for the account selection and
-     * a check for Google Play Services being up to date.
-     */
     @Override
     protected final void onCreate(final Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_signin);
 
-        if (!IApiConstants.SIGN_IN_REQUIRED) {
-            // The app won't use authentication, just launch the main activity.
-            startMainActivity();
-            return;
-        }
+        applicationPreferences = getSharedPreferences(IPreference.APPLICATION_PREFERENCES, Context.MODE_PRIVATE);
 
-        if (!checkPlayServices()) {
-            // Google Play Services are required, so don't proceed until they
-            // are installed.
-            return;
-        }
+        if (isSignedIn(this)) {
 
-        if (isSignedIn()) {
-
+            Logger.info(TAG, "Already signed in.");
             startMainActivity();
 
         } else {
 
-            startActivityForResult(credential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
-        }
+            if(applicationPreferences.getBoolean(IPreference.KEY_FIRST_APPLICATION_START, true)
+                    || IntentUtil.getBooleanExtra(getIntent(), EXTRA_SIGN_IN)) {
 
+                Logger.info(TAG, "First application start.");
+                AlertDialog alertDialog = new AlertDialog.Builder(this)
+                        .setMessage("Do you want to sign in with your google account to synchronize your mood data among all your devices?")
+                        .setCancelable(false)
+                        .setPositiveButton("Yes!", this)
+                        .setNegativeButton("No, thanks.", this).create();
+                alertDialog.show();
+                applicationPreferences.edit().putBoolean(IPreference.KEY_FIRST_APPLICATION_START, false).apply();
+
+            } else {
+
+                Logger.info(TAG, "User decided not to sign in.");
+                startMainActivity();
+            }
+        }
     }
 
     /**
-     * Handles the results from activities launched to select an account and to
-     * install Google Play Services.
+     * Handles the results from activities launched to select an account and to install Google Play
+     * Services.
      */
     @Override
     protected final void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
-
         super.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
@@ -133,81 +120,82 @@ public class SignInActivity extends Activity {
 
                 if (resultCode != Activity.RESULT_OK) {
 
-                    checkPlayServices();
+                    Logger.info(TAG, "Play services request canceled by user!");
+                    Toast.makeText(this, "Google Play Services must be installed.", Toast.LENGTH_SHORT).show();
+                    cancelSignIn();
                 }
                 break;
 
             case REQUEST_ACCOUNT_PICKER:
             default:
 
-                if (data != null && data.getExtras() != null) {
+                if (resultCode == Activity.RESULT_OK) {
 
-                    String accountName = data.getExtras().getString(AccountManager.KEY_ACCOUNT_NAME);
+                    if (IntentUtil.hasExtra(data, AccountManager.KEY_ACCOUNT_NAME)) {
 
-                    if (accountName != null) {
+                        String accountName = data.getExtras().getString(AccountManager.KEY_ACCOUNT_NAME);
 
-                        onSignedIn(accountName);
-                        return;
+                        if (accountName != null) {
+
+                            Logger.info(TAG, "User signed in with '" + accountName + "'.");
+                            onSignedIn(accountName);
+
+                        } else {
+
+                            Logger.info(TAG, "User didn't choose an account.");
+                            cancelSignIn();
+                        }
                     }
+                } else {
+
+                    Logger.info(TAG, "Account picker canceled by user!");
+                    cancelSignIn();
                 }
-                // Signing in is required so display the dialog again
-                startActivityForResult(credential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
 
                 break;
         }
     }
 
     /**
-     * Retrieves the previously used account name from the application
-     * preferences and checks if  the credential object can be set to this
-     * account.
-     * @return a boolean indicating if the user is signed in or not
+     * Sets the a flag to reflect that the user does not want to sign in and start the MainActivity.
      */
-    private boolean isSignedIn() {
+    private void cancelSignIn() {
 
-        credential = GoogleAccountCredential.usingAudience(this, IApiConstants.AUDIENCE_ANDROID_CLIENT_ID);
-
-        SharedPreferences sharedPreferences = getSharedPreferences(IPreference.APPLICATION_PREFERENCES, Context.MODE_PRIVATE);
-        String accountName = sharedPreferences.getString(IPreference.KEY_ACCOUNT_NAME, null);
-
-        credential.setSelectedAccountName(accountName);
-
-        return credential.getSelectedAccount() != null;
-    }
-
-    /**
-     * Called when the user selected an account. The account name is stored in
-     * the application preferences and set in the credential object.
-     * @param accountName the account that the user selected.
-     */
-    private void onSignedIn(final String accountName) {
-
-        SharedPreferences sharedPreferences = getSharedPreferences(IPreference.APPLICATION_PREFERENCES, Context.MODE_PRIVATE);
-
-        credential.setSelectedAccountName(accountName);
-
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(IPreference.KEY_ACCOUNT_NAME, accountName);
-        editor.apply();
+        applicationPreferences.edit().putBoolean(IPreference.KEY_DO_SIGN_IN, false).apply();
 
         startMainActivity();
     }
 
     /**
-     * Registers the device with GCM if necessary, and then navigates to the
-     * MainActivity.
+     * Called when the user selected an account. The account name is stored in the application
+     * preferences and set in the credential object.
+     * @param accountName the account that the user selected.
+     */
+    private void onSignedIn(final String accountName) {
+
+        credential.setSelectedAccountName(accountName);
+
+        applicationPreferences.edit().putBoolean(IPreference.KEY_DO_SIGN_IN, true).apply();
+        applicationPreferences.edit().putString(IPreference.KEY_ACCOUNT_NAME, accountName).apply();
+
+        startMainActivity();
+    }
+
+    /**
+     * Navigates to the MainActivity.
      */
     private void startMainActivity() {
 
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
+        finish();
     }
 
     @Override
     protected final void onResume() {
         super.onResume();
 
-        if (IApiConstants.SIGN_IN_REQUIRED) {
+        if(applicationPreferences.getBoolean(IPreference.KEY_DO_SIGN_IN, false)) {
             // As per GooglePlayServices documentation, an application needs to
             // check from within onResume if Google Play Services is available.
             checkPlayServices();
@@ -215,8 +203,8 @@ public class SignInActivity extends Activity {
     }
 
     /**
-     * Checks if Google Play Services are installed and if not it initializes
-     * opening the dialog to allow user to install Google Play Services.
+     * Checks if Google Play Services are installed and if not it initializes opening the dialog to
+     * allow user to install Google Play Services.
      * @return a boolean indicating if the Google Play Services are available.
      */
     private boolean checkPlayServices() {
@@ -227,15 +215,76 @@ public class SignInActivity extends Activity {
 
             if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
 
-                GooglePlayServicesUtil.getErrorDialog(resultCode, this, MainActivity.PLAY_SERVICES_RESOLUTION_REQUEST).show();
+                GooglePlayServicesUtil.getErrorDialog(resultCode, this, REQUEST_GOOGLE_PLAY_SERVICES).show();
 
             } else {
 
                 Logger.info(TAG, "This device is not supported.");
-                finish();
+                cancelSignIn();
             }
             return false;
         }
         return true;
+    }
+
+    @Override
+    public void onClick(DialogInterface dialog, int which) {
+
+        switch (which) {
+
+            case DialogInterface.BUTTON_POSITIVE:
+
+                startActivityForResult(credential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
+                break;
+
+            case DialogInterface.BUTTON_NEGATIVE:
+
+                cancelSignIn();
+                break;
+
+            default:
+                throw new AssertionError("Unhandled user action!");
+        }
+
+    }
+
+    /**
+     * Retrieves the previously used account name from the application preferences and checks if the
+     * credential object can be set to this account.
+     * @return a boolean indicating if the user is signed in or not
+     */
+    public static boolean isSignedIn(final Activity activity) {
+
+        if(credential == null)
+            credential = GoogleAccountCredential.usingAudience(activity, IApiConstants.AUDIENCE_ANDROID_CLIENT_ID);
+
+        String accountName = activity.getSharedPreferences(IPreference.APPLICATION_PREFERENCES, Context.MODE_PRIVATE).getString(IPreference.KEY_ACCOUNT_NAME, null);
+
+        credential.setSelectedAccountName(accountName);
+
+        return credential.getSelectedAccount() != null;
+    }
+
+    /**
+     * Called to sign out the user, so user can later on select a different account.
+     * @param activity activity that initiated the sign out.
+     */
+    public static void onSignOut(final Activity activity) {
+
+        SharedPreferences applicationPreferences = activity.getSharedPreferences(IPreference.APPLICATION_PREFERENCES, Context.MODE_PRIVATE);
+
+        applicationPreferences.edit().putString(IPreference.KEY_ACCOUNT_NAME, "").apply();
+        credential.setSelectedAccountName("");
+
+        startSignInActivity(activity);
+    }
+
+    /**
+     * Navigates to the SignInActivity.
+     */
+    private static void startSignInActivity(Activity activity) {
+
+        Intent intent = new Intent(activity, SignInActivity.class);
+        activity.startActivity(intent);
     }
 }

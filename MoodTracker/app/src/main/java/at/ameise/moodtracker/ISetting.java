@@ -6,13 +6,15 @@ import java.util.Locale;
 /**
  * Contains some settings.
  *
- * Created by Mario Gastegger <mgastegger AT buzzmark DOT com> on 05.03.15.
+ * Created by Mario Gastegger <mario DOT gastegger AT gmail DOT com> on 05.03.15.
  */
 public interface ISetting {
 
-    final boolean APP_MODE_DEBUG = true;
+    boolean APP_MODE_DEBUG = BuildConfig.DEBUG;
 
-    final boolean LOG_MODE_DEBUG = true;
+    boolean LOG_MODE_DEBUG = BuildConfig.DEBUG;
 
-    final SimpleDateFormat DEBUG_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd -- HH:mm:ss.SSSZ", Locale.GERMAN);
+    int BACKEND_CALL_TRIES = BuildConfig.BACKEND_CALL_TRIES;
+
+    SimpleDateFormat DEBUG_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd -- HH:mm:ss.SSSZ", Locale.GERMAN);
 }

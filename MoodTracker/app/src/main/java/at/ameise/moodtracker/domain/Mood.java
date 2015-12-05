@@ -1,6 +1,9 @@
 package at.ameise.moodtracker.domain;
 
+import org.joda.time.DateTime;
+
 import java.util.Calendar;
+import java.util.Date;
 
 import at.ameise.moodtracker.ISetting;
 
@@ -13,8 +16,9 @@ public class Mood {
 
     private Long id;
     private float mood;
-    private Calendar date;
-    private MoodTableHelper.EMoodScope scope;
+    private long timestampMs;
+    private String scope;
+    private boolean onBackend;
 
     /**
      * Sets the default scope {@link at.ameise.moodtracker.domain.MoodTableHelper.EMoodScope#RAW} and the current time.
@@ -22,8 +26,8 @@ public class Mood {
     public Mood(float mood) {
 
         this.mood = mood;
-        this.date = Calendar.getInstance();
-        this.scope = MoodTableHelper.EMoodScope.RAW;
+        this.timestampMs = Calendar.getInstance().getTimeInMillis();
+        this.scope = MoodTableHelper.EMoodScope.RAW.name();
     }
 
     /**
@@ -38,33 +42,24 @@ public class Mood {
         return "Mood {" +
                 "id=" + id + ", " +
                 "mood=" + mood + ", " +
-                "date=" + ISetting.DEBUG_DATE_FORMAT.format(date.getTime()) + ", " +
+                "timestampMs=" + ISetting.DEBUG_DATE_FORMAT.format(new Date(timestampMs)) + ", " +
                 "scope=" + scope +
                 '}';
     }
 
-    public Calendar getDate() {
-        return date;
+    public DateTime getTimestamp() {
+        return new DateTime(timestampMs);
     }
 
-    public long getDateInSeconds() {
-        return date.getTimeInMillis() / 1000;
+    void setTimestamp(long milliSeconds) {
+        this.timestampMs = milliSeconds;
     }
 
-    void setDate(long seconds) {
-
-        final Calendar c = Calendar.getInstance();
-        c.setTimeInMillis(seconds * 1000);
-
-        this.date = c;
-    }
-
-    void setDate(Calendar date) {
-        this.date = date;
+    void setTimestamp(DateTime timestamp) {
+        this.timestampMs = timestamp.getMillis();
     }
 
     public float getMood() {
-
         return mood;
     }
 
@@ -81,10 +76,29 @@ public class Mood {
     }
 
     public MoodTableHelper.EMoodScope getScope() {
-        return scope;
+        return MoodTableHelper.EMoodScope.valueOf(scope);
     }
 
     void setScope(MoodTableHelper.EMoodScope scope) {
-        this.scope = scope;
+        this.scope = scope.name();
+    }
+
+    public at.ameise.moodtracker.moodTrackerBackend.model.Mood getMoodModel() {
+
+        at.ameise.moodtracker.moodTrackerBackend.model.Mood mood = new at.ameise.moodtracker.moodTrackerBackend.model.Mood();
+
+        mood.setMood(this.mood);
+        mood.setScope(this.scope);
+        mood.setTimestamp(this.timestampMs);
+
+        return mood;
+    }
+
+    public boolean isOnBackend() {
+        return onBackend;
+    }
+
+    public void setOnBackend(boolean onBackend) {
+        this.onBackend = onBackend;
     }
 }

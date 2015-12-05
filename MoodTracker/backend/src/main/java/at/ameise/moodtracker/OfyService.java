@@ -16,7 +16,8 @@
 
 package at.ameise.moodtracker;
 
-import at.ameise.moodtracker.models.Registration;
+import at.ameise.moodtracker.models.Mood;
+import at.ameise.moodtracker.models.UserAccount;
 
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.ObjectifyFactory;
@@ -35,9 +36,8 @@ public final class OfyService {
     }
 
     static {
-            factory().register(Registration.class);
-            factory().register(Synchronization.class);
-            factory().register(Recommendation.class);
+        factory().register(UserAccount.class);
+        factory().register(Mood.class);
     }
 
     /**

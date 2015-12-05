@@ -17,7 +17,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "mood.db";
 
-    private static final int DATABASE_VERSION = 7;
+    private static final int DATABASE_VERSION = 8;
 
 
     private static DatabaseHelper INSTANCE = null;
@@ -47,7 +47,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private void onDrop(SQLiteDatabase db) {
 
-        db.execSQL(createDropStatement(MoodTableHelper.TABLE_NAME));
+        db.execSQL(createStmtDrop(MoodTableHelper.TABLE_NAME));
     }
 
     @Override
@@ -70,8 +70,34 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             removeMyScopeColumn(db);
         }
 
+        if(oldVersion <= 8) {
+
+            changeTimestampTypeToLong(db);
+        }
+
         //onDrop(db);
         //onCreate(db);
+    }
+
+    /**
+     * Creates new table with the correct column types, migrates the values, deletes the original table and renames the new table.
+     * @param db
+     */
+    private void changeTimestampTypeToLong(SQLiteDatabase db) {
+
+        Logger.info(ITag.DATABASE, "Upgrading table '"+MoodTableHelper.TABLE_NAME+"': Changing type of column '"+MoodTableHelper.COL_TIMESTAMP+"' from string to number...");
+
+        final String MIGRATION_TABLE = "migrate_mood";
+        //create new table
+        db.execSQL(MoodTableHelper.createStmtCreate(MIGRATION_TABLE));
+
+        //move to new table(with conversion)
+        db.execSQL("INSERT INTO "+MIGRATION_TABLE+" SELECT "+MoodTableHelper.COL_ID+", CAST("+MoodTableHelper.COL_TIMESTAMP+" AS INTEGER)"+", "+MoodTableHelper.COL_MOOD+", "+MoodTableHelper.COL_SCOPE+" FROM "+MoodTableHelper.TABLE_NAME);
+        //drop old table
+        db.execSQL(createStmtDrop(MoodTableHelper.TABLE_NAME));
+
+        //rename new table
+        db.execSQL(createStmtRename(MIGRATION_TABLE, MoodTableHelper.TABLE_NAME));
     }
 
     /**
@@ -89,10 +115,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //move to new table(with conversion)
         db.execSQL("INSERT INTO "+MIGRATION_TABLE+" SELECT "+MoodTableHelper.COL_ID+","+MoodTableHelper.COL_TIMESTAMP+","+MoodTableHelper.COL_MOOD+","+MoodTableHelper.COL_SCOPE+" FROM "+MoodTableHelper.TABLE_NAME);
         //drop old table
-        db.execSQL(createDropStatement(MoodTableHelper.TABLE_NAME));
+        db.execSQL(createStmtDrop(MoodTableHelper.TABLE_NAME));
 
         //rename new table
-        db.execSQL(createRenameStatement(MIGRATION_TABLE, MoodTableHelper.TABLE_NAME));
+        db.execSQL(createStmtRename(MIGRATION_TABLE, MoodTableHelper.TABLE_NAME));
     }
 
     /**
@@ -121,13 +147,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //move to new table(with conversion)
         db.execSQL("INSERT INTO "+MIGRATION_TABLE+" SELECT * FROM "+MoodTableHelper.TABLE_NAME);
         //drop old table
-        db.execSQL(createDropStatement(MoodTableHelper.TABLE_NAME));
+        db.execSQL(createStmtDrop(MoodTableHelper.TABLE_NAME));
 
         //rename new table
-        db.execSQL(createRenameStatement(MIGRATION_TABLE, MoodTableHelper.TABLE_NAME));
+        db.execSQL(createStmtRename(MIGRATION_TABLE, MoodTableHelper.TABLE_NAME));
     }
 
-    private static String createRenameStatement(String fromTableName, String toTableName) {
+    private static String createStmtRename(String fromTableName, String toTableName) {
 
         return "ALTER TABLE "+fromTableName+" RENAME TO "+toTableName;
     }
@@ -136,7 +162,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param tableName
      * @return a drop statement for the specified table name.
      */
-    private static String createDropStatement(String tableName) {
+    private static String createStmtDrop(String tableName) {
 
         return "DROP TABLE "+tableName;
     }

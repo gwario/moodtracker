@@ -15,8 +15,9 @@ import at.ameise.moodtracker.util.Logger;
 
 /**
  * Contains the methods to calculate average values. Operates on the data provider level.
+ * TODO refactor to use joda time
  *
- * Created by Mario Gastegger <mgastegger AT buzzmark DOT com> on 05.04.15.
+ * Created by Mario Gastegger <mario DOT gastegger AT gmail DOT com> on 05.04.15.
  */
 public class AverageCalculatorHelper {
 
@@ -79,7 +80,7 @@ public class AverageCalculatorHelper {
 
                     mood = new Mood();
                     mood.setScope(MoodTableHelper.EMoodScope.MONTH);
-                    mood.setDate(startDate);
+                    mood.setTimestamp(startDate.getTimeInMillis());
                     mood.setMood(averageMood);
 
                     //add mood to bulk
@@ -159,7 +160,7 @@ public class AverageCalculatorHelper {
 
                     mood = new Mood();
                     mood.setScope(MoodTableHelper.EMoodScope.WEEK);
-                    mood.setDate(startDate);
+                    mood.setTimestamp(startDate.getTimeInMillis());
                     mood.setMood(averageMood);
 
                     //add mood to bulk
@@ -239,7 +240,7 @@ public class AverageCalculatorHelper {
 
                     mood = new Mood();
                     mood.setScope(MoodTableHelper.EMoodScope.DAY);
-                    mood.setDate(startDate);
+                    mood.setTimestamp(startDate.getTimeInMillis());
                     mood.setMood(averageMood);
 
                     //add mood to bulk
@@ -319,7 +320,7 @@ public class AverageCalculatorHelper {
 
                     mood = new Mood();
                     mood.setScope(MoodTableHelper.EMoodScope.QUARTER_DAY);
-                    mood.setDate(startDate);
+                    mood.setTimestamp(startDate.getTimeInMillis());
                     mood.setMood(averageMood);
 
                     //add mood to bulk

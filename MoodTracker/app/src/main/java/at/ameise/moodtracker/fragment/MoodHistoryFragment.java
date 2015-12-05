@@ -2,6 +2,7 @@ package at.ameise.moodtracker.fragment;
 
 import android.app.Fragment;
 import android.app.LoaderManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
@@ -21,8 +22,10 @@ import com.github.mikephil.charting.data.LineDataSet;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import at.ameise.moodtracker.ILoader;
+import at.ameise.moodtracker.IPreference;
 import at.ameise.moodtracker.ISetting;
 import at.ameise.moodtracker.ITag;
 import at.ameise.moodtracker.R;
@@ -38,8 +41,9 @@ import at.ameise.moodtracker.util.ShareUtil;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link MoodHistoryFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * Use the {@link MoodHistoryFragment#newInstance} factory method to create an instance of this
+ * fragment.
+ * Created by Mario Gastegger <mario DOT gastegger AT gmail DOT com>
  */
 public class MoodHistoryFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -140,6 +144,32 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
                 }
             });
         }
+
+        if(SignInActivity.isSignedIn(getActivity())) {
+
+            MenuItem item = menu.add(R.string.options_menu_signOut);
+            item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+
+                    SignInActivity.onSignOut(getActivity());
+                    getActivity().finish();
+                    return true;
+                }
+            });
+        } else {
+
+            MenuItem item = menu.add(R.string.options_menu_signIn);
+            item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+
+                    startActivity(new Intent(getActivity(), SignInActivity.class).putExtra(SignInActivity.EXTRA_SIGN_IN, true));
+                    getActivity().finish();
+                    return true;
+                }
+            });
+        }
     }
 
     @Override
@@ -195,10 +225,6 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
                 startActivity(new Intent().putExtra(SimpleImportExportActivity.EXTRA_IMPORT, true).setClass(getActivity(), SimpleImportExportActivity.class));
                 return true;
 
-            case R.id.menu_item_signOut:
-                SignInActivity.onSignOut(getActivity());
-                return true;
-
             default:
                 return super.onOptionsItemSelected(selectedItem);
         }
@@ -238,7 +264,7 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
                 Logger.verbose(ITag.MOOD_HISTORY, mood.toString());
 
                 entries.add(index, new Entry(mood.getMood(), index));
-                xValues.add(dateFormat.format(mood.getDate().getTime()));
+                xValues.add(dateFormat.format(new Date(mood.getTimestamp().getMillis())));
 
                 index++;
 
