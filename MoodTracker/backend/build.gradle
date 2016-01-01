@@ -13,8 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
+description = 'The appengine backend for synchronization and communication.'
 
 buildscript {
     repositories {

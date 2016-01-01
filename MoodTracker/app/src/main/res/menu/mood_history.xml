@@ -26,4 +26,8 @@
     <item android:id="@+id/menu_item_import"
         android:title="@string/options_menu_import"
         android:showAsAction="never"/>
+
+    <item android:id="@+id/menu_item_syncNow"
+          android:title="@string/options_menu_syncNow"
+          android:showAsAction="never"/>
 </menu>

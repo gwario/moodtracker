@@ -24,7 +24,7 @@
         <init-param>
             <param-name>services</param-name>
             <param-value>
-                at.ameise.moodtracker.apis.MoodEndpoint
+                at.ameise.moodtracker.backend.apis.MoodEndpoint
             </param-value>
         </init-param>
     </servlet>
@@ -35,7 +35,7 @@
 
     <servlet>
         <servlet-name>MaintenanceTasksServlet</servlet-name>
-        <servlet-class>at.ameise.moodtracker.apis.MaintenanceTasksServlet
+        <servlet-class>at.ameise.moodtracker.backend.apis.MaintenanceTasksServlet
         </servlet-class>
     </servlet>
     <servlet-mapping>
@@ -45,7 +45,7 @@
 
     <servlet>
         <servlet-name>MoodServlet</servlet-name>
-        <servlet-class>at.ameise.moodtracker.apis.MoodServlet
+        <servlet-class>at.ameise.moodtracker.backend.apis.MoodServlet
         </servlet-class>
     </servlet>
     <servlet-mapping>

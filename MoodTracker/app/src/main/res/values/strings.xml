@@ -11,6 +11,8 @@
     <string name="options_menu_export">export</string>
     <string name="options_menu_import">import</string>
 
+    <string name="options_menu_syncNow">Sync Now</string>
+
     <string name="options_menu_share">Share</string>
     <string name="options_menu_signIn">Sign In</string>
     <string name="options_menu_signOut">Sign Out</string>
@@ -19,6 +21,8 @@
 
     <string name="message_no_moods_yet">No moods yet!</string>
     <string name="message_still_loading">Data not yet loaded.</string>
+
+    <string name="message_enterMood_text">Updated mood</string>
 
     <!-- used for sharing messages -->
     <string name="share_message_subject">My mood just changed...</string>
