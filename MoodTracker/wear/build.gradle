@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 
+description = 'The android smart watch app.'
 
 android {
     compileSdkVersion 21

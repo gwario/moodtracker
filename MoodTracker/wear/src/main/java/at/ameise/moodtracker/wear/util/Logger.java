@@ -2,7 +2,7 @@ package at.ameise.moodtracker.wear.util;
 
 import android.util.Log;
 
-import at.ameise.moodtracker.ISetting;
+import at.ameise.moodtracker.wear.Settings;
 
 /**
  * Wraps the methods of the Android logging framework {@link Log}. Before
@@ -25,7 +25,7 @@ public final class Logger {
 	 * @param message
 	 */
 	public static void wtf(String tag, String message) {
-		if (Log.isLoggable(tag, Log.ASSERT) || ISetting.LOG_MODE_DEBUG)
+		if (Log.isLoggable(tag, Log.ASSERT) || Settings.LOG_MODE_DEBUG)
 			Log.wtf(tag, message);
 	}
 
@@ -35,7 +35,7 @@ public final class Logger {
 	 * @param message
 	 */
 	public static void wtf(String tag, String message, Throwable throwable) {
-		if (Log.isLoggable(tag, Log.ASSERT) || ISetting.LOG_MODE_DEBUG)
+		if (Log.isLoggable(tag, Log.ASSERT) || Settings.LOG_MODE_DEBUG)
 			Log.wtf(tag, message, throwable);
 	}
 
@@ -45,7 +45,7 @@ public final class Logger {
 	 * @param message
 	 */
 	public static void error(String tag, String message) {
-		if (Log.isLoggable(tag, Log.ERROR) || ISetting.LOG_MODE_DEBUG)
+		if (Log.isLoggable(tag, Log.ERROR) || Settings.LOG_MODE_DEBUG)
 			Log.e(tag, message);
 	}
 
@@ -56,7 +56,7 @@ public final class Logger {
 	 * @param throwable
 	 */
 	public static void error(String tag, String message, Throwable throwable) {
-		if (Log.isLoggable(tag, Log.ERROR) || ISetting.LOG_MODE_DEBUG)
+		if (Log.isLoggable(tag, Log.ERROR) || Settings.LOG_MODE_DEBUG)
 			Log.e(tag, message, throwable);
 	}
 
@@ -67,7 +67,7 @@ public final class Logger {
 	 * @param message
 	 */
 	public static void warn(String tag, String message) {
-		if (Log.isLoggable(tag, Log.WARN) || ISetting.LOG_MODE_DEBUG)
+		if (Log.isLoggable(tag, Log.WARN) || Settings.LOG_MODE_DEBUG)
 			Log.w(tag, message);
 	}
 
@@ -78,7 +78,7 @@ public final class Logger {
 	 * @param throwable
 	 */
 	public static void warn(String tag, String message, Throwable throwable) {
-		if (Log.isLoggable(tag, Log.WARN) || ISetting.LOG_MODE_DEBUG)
+		if (Log.isLoggable(tag, Log.WARN) || Settings.LOG_MODE_DEBUG)
 			Log.w(tag, message, throwable);
 	}
 
@@ -88,7 +88,7 @@ public final class Logger {
 	 * @param message
 	 */
 	public static void info(String tag, String message) {
-		if (Log.isLoggable(tag, Log.INFO) || ISetting.LOG_MODE_DEBUG)
+		if (Log.isLoggable(tag, Log.INFO) || Settings.LOG_MODE_DEBUG)
 			Log.i(tag, message);
 	}
 
@@ -98,7 +98,7 @@ public final class Logger {
 	 * @param message
 	 */
 	public static void debug(String tag, String message) {
-		if (Log.isLoggable(tag, Log.DEBUG) || ISetting.LOG_MODE_DEBUG)
+		if (Log.isLoggable(tag, Log.DEBUG) || Settings.LOG_MODE_DEBUG)
 			Log.d(tag, message);
 	}
 
@@ -108,7 +108,7 @@ public final class Logger {
 	 * @param message
 	 */
 	public static void verbose(String tag, String message) {
-		if (Log.isLoggable(tag, Log.VERBOSE) || ISetting.LOG_MODE_DEBUG)
+		if (Log.isLoggable(tag, Log.VERBOSE) || Settings.LOG_MODE_DEBUG)
 			Log.v(tag, message);
 	}
 }

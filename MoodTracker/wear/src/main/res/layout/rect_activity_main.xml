@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:gravity="center"
     android:background="@android:color/white"
-    tools:context=".MainActivity"
+    tools:context=".activity.MainActivity"
     tools:deviceIds="wear_square">
 
     <LinearLayout
@@ -18,7 +18,8 @@
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/sad"
+            android:src="@drawable/sad_src_selector"
+            android:background="@android:color/transparent"
             android:id="@+id/ibCurrentMoodWear0"
             android:layout_weight="1"
             android:scaleType="centerInside"
@@ -30,6 +31,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/dot_src_selector"
+            android:background="@android:color/transparent"
             android:id="@+id/ibCurrentMoodWear1"
             android:layout_weight="1"
             android:scaleType="centerInside"
@@ -40,6 +42,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/dot_src_selector"
+            android:background="@android:color/transparent"
             android:id="@+id/ibCurrentMoodWear2"
             android:layout_weight="1"
             android:scaleType="centerInside"
@@ -49,7 +52,8 @@
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/average"
+            android:src="@drawable/average_src_selector"
+            android:background="@android:color/transparent"
             android:id="@+id/ibCurrentMoodWear3"
             android:layout_weight="1"
             android:scaleType="centerInside"
@@ -60,6 +64,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/dot_src_selector"
+            android:background="@android:color/transparent"
             android:id="@+id/ibCurrentMoodWear4"
             android:layout_weight="1"
             android:scaleType="centerInside"
@@ -70,6 +75,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/dot_src_selector"
+            android:background="@android:color/transparent"
             android:id="@+id/ibCurrentMoodWear5"
             android:layout_weight="1"
             android:scaleType="centerInside"
@@ -79,7 +85,8 @@
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/happy"
+            android:src="@drawable/happy_src_selector"
+            android:background="@android:color/transparent"
             android:id="@+id/ibCurrentMoodWear6"
             android:layout_weight="1"
             android:scaleType="centerInside"
