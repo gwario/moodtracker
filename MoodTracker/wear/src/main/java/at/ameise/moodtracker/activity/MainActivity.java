@@ -1,4 +1,4 @@
-package at.ameise.moodtracker.wear.activity;
+package at.ameise.moodtracker.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -6,8 +6,9 @@ import android.support.wearable.view.WatchViewStub;
 import android.view.View;
 import android.widget.ImageView;
 
-import at.ameise.moodtracker.wear.R;
-import at.ameise.moodtracker.wear.util.Logger;
+import at.ameise.moodtracker.R;
+import at.ameise.moodtracker.util.Logger;
+
 
 public class MainActivity extends Activity {
 

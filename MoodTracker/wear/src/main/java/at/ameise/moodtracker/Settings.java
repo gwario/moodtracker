@@ -1,4 +1,4 @@
-package at.ameise.moodtracker.wear;
+package at.ameise.moodtracker;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;

@@ -1,8 +1,8 @@
-package at.ameise.moodtracker.wear.util;
+package at.ameise.moodtracker.util;
 
 import android.util.Log;
 
-import at.ameise.moodtracker.wear.Settings;
+import at.ameise.moodtracker.Settings;
 
 /**
  * Wraps the methods of the Android logging framework {@link Log}. Before
