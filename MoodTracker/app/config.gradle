@@ -22,12 +22,15 @@ android {
 
         buildConfigField "Integer", "BACKEND_CALL_TRIES",  "3"
 
+        buildConfigField "Integer", "SYNC_SERVICE_INTERVAL_H",  "4"
+
         /**
          * The URL to the API. Default when running locally on your computer:
          * "http://10.0.2.2:8080/_ah/api/"
          */
         buildConfigField "String", "ROOT_URL",  "\"https://grounded-braid-114120.appspot.com/_ah/api/\""
         //buildConfigField "String", "ROOT_URL",  "\"http://10.0.2.2:8080/_ah/api/\""
+        //The URL to the API. Default when running locally on your computer: "http://10.0.2.2:8080/_ah/api/"
 
         /**
          * Substitute you own sender ID here. This is the project number you got
