@@ -1,18 +1,27 @@
 <resources>
     <string name="app_name">MoodTracker</string>
-    <string name="appwidget_text">EXAMPLE</string>
-    <string name="add_widget">Add widget</string>
+    <string name="appwidget_text">MoodTracker Widget</string>
 
     <string name="options_menu_day_values">Alle Werte</string>
     <string name="options_menu_daily_avg">Tag</string>
     <string name="options_menu_weekly_avg">Woche</string>
     <string name="options_menu_monthly_avg">Monat</string>
+
+    <string name="options_menu_export">Exportieren</string>
+    <string name="options_menu_import">Importieren</string>
+
+    <string name="options_menu_syncNow">Jetzt synchronisieren</string>
+
     <string name="options_menu_share">Teilen</string>
+    <string name="options_menu_signIn">Sign In</string>
+    <string name="options_menu_signOut">Sign Out</string>
 
     <string name="share_chooser_text">Aktuelle Stimmung teilen</string>
 
     <string name="message_no_moods_yet">Noch keinen Stimmung vorhanden!</string>
     <string name="message_still_loading">Daten noch nicht geladen.</string>
+
+    <string name="message_enterMood_text">Stimmung aktialisiert</string>
 
     <!-- used for sharing messages -->
     <string name="share_message_subject">Meine laune hat sich gerade geändert...</string><!-- this is optional-->
@@ -30,4 +39,10 @@
     <string name="history_date_format_weekly">\'Woche \'W\', \'MMMM\' \'\'\'yy</string>
     <string name="history_date_format_monthly">MMMM yyyy</string>
     <!-- /diagram x-axis date formats -->
+
+    <string name="title_activity_simple_import_export">SimpleImportExportActivity</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="title_activity_main_wear">MainWearActivity</string>
+
 </resources>

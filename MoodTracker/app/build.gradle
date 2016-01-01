@@ -14,8 +14,46 @@ android {
         versionName "1.0"
         multiDexEnabled true
     }
+    final Console console = System.console();
+    if (console != null) {
+        // Building from command line
+        signingConfigs {
+            debug {
+                storeFile file("../devel.jks")
+                storePassword "moodtracker"
+                keyAlias "moodtracker"
+                keyPassword "moodtracker"
+            }
+            release {
+                storeFile file("keystore")
+                storePassword System.console().readLine("\nKeystore password: ")
+                keyAlias "MoodTrackerReleaseKey"
+                keyPassword System.console().readLine("\nKey password: ")
+            }
+        }
+    } else {
+        // Building from IDE's "Run" button
+        signingConfigs {
+            debug {
+                storeFile file("../devel.jks")
+                storePassword "moodtracker"
+                keyAlias "moodtracker"
+                keyPassword "moodtracker"
+            }
+            release {
+                storeFile file("../devel.jks")
+                storePassword "moodtracker"
+                keyAlias "moodtracker"
+                keyPassword "moodtracker"
+            }
+        }
+    }
     buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+        }
         release {
+            signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -30,6 +68,7 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(path: ':backend', configuration: 'android-endpoints')
+    wearApp project(':wear')
     compile 'com.android.support:multidex:1.0.1'
     compile 'com.github.PhilJay:MPAndroidChart:v2.1.6'
     compile 'net.danlew:android.joda:2.9.0'
