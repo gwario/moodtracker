@@ -5,6 +5,10 @@ import android.os.Bundle;
 import android.support.wearable.view.WatchViewStub;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import at.ameise.moodtracker.R;
 import at.ameise.moodtracker.util.Logger;
@@ -22,10 +26,12 @@ public class MainActivity extends Activity {
     private ImageView ibCurrentMood5;
     private ImageView ibCurrentMood6;
 
-    private ImageView ibIncrement;
-    private ImageView ibDecrement;
     private ImageView ibSet;
-    private ImageView ibShare;
+    //private ImageView ibShare;
+
+    private static int currentMoodInt = -1;
+
+    private List<ImageView> moodButtons;
 
 
     @Override
@@ -33,6 +39,8 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+
+        moodButtons = new ArrayList<>();
 
         final WatchViewStub stub = (WatchViewStub) findViewById(R.id.watch_view_stub);
         stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
@@ -47,104 +55,122 @@ public class MainActivity extends Activity {
                 ibCurrentMood5 = (ImageView) stub.findViewById(R.id.ibCurrentMoodWear5);
                 ibCurrentMood6 = (ImageView) stub.findViewById(R.id.ibCurrentMoodWear6);
 
-
-                ibIncrement = (ImageView) stub.findViewById(R.id.ibIncrementMood);
-                ibDecrement = (ImageView) stub.findViewById(R.id.ibDecrementMood);
                 ibSet = (ImageView) stub.findViewById(R.id.ibSetCurrentMood);
-                ibShare = (ImageView) stub.findViewById(R.id.ibShareCurrentMood);
+                //ibShare = (ImageView) stub.findViewById(R.id.ibShareCurrentMood);
 
-                ibCurrentMood0.setSelected(true);
+                moodButtons.add(ibCurrentMood0);
+                moodButtons.add(ibCurrentMood1);
+                moodButtons.add(ibCurrentMood2);
+                moodButtons.add(ibCurrentMood3);
+                moodButtons.add(ibCurrentMood4);
+                moodButtons.add(ibCurrentMood5);
+                moodButtons.add(ibCurrentMood6);
+
                 ibCurrentMood0.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        ibCurrentMood1.setSelected(true);
-                        ibCurrentMood2.setSelected(false);
-                        ibCurrentMood3.setSelected(false);
-                        ibCurrentMood4.setSelected(false);
-                        ibCurrentMood5.setSelected(false);
-                        ibCurrentMood6.setSelected(false);
-                        Logger.debug(TAG, "Mood: 1");
+                        currentMoodInt = 1;
+                        setMoodOnButtons(currentMoodInt);
+                        Logger.verbose(TAG, "Mood: " + currentMoodInt);
                     }
                 });
 
                 ibCurrentMood1.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        ibCurrentMood1.setSelected(true);
-                        ibCurrentMood2.setSelected(false);
-                        ibCurrentMood3.setSelected(false);
-                        ibCurrentMood4.setSelected(false);
-                        ibCurrentMood5.setSelected(false);
-                        ibCurrentMood6.setSelected(false);
-                        Logger.debug(TAG, "Mood: 2");
+                        currentMoodInt = 2;
+                        setMoodOnButtons(currentMoodInt);
+                        Logger.verbose(TAG, "Mood: " + currentMoodInt);
                     }
                 });
 
                 ibCurrentMood2.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        ibCurrentMood1.setSelected(true);
-                        ibCurrentMood2.setSelected(true);
-                        ibCurrentMood3.setSelected(false);
-                        ibCurrentMood4.setSelected(false);
-                        ibCurrentMood5.setSelected(false);
-                        ibCurrentMood6.setSelected(false);
-                        Logger.debug(TAG, "Mood: 3");
+                        currentMoodInt = 3;
+                        setMoodOnButtons(currentMoodInt);
+                        Logger.verbose(TAG, "Mood: " + currentMoodInt);
                     }
                 });
 
                 ibCurrentMood3.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        ibCurrentMood1.setSelected(true);
-                        ibCurrentMood2.setSelected(true);
-                        ibCurrentMood3.setSelected(true);
-                        ibCurrentMood4.setSelected(false);
-                        ibCurrentMood5.setSelected(false);
-                        ibCurrentMood6.setSelected(false);
-                        Logger.debug(TAG, "Mood: 4");
+                        currentMoodInt = 4;
+                        setMoodOnButtons(currentMoodInt);
+                        Logger.verbose(TAG, "Mood: " + currentMoodInt);
                     }
                 });
 
                 ibCurrentMood4.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        ibCurrentMood1.setSelected(true);
-                        ibCurrentMood2.setSelected(true);
-                        ibCurrentMood3.setSelected(true);
-                        ibCurrentMood4.setSelected(true);
-                        ibCurrentMood5.setSelected(false);
-                        ibCurrentMood6.setSelected(false);
-                        Logger.debug(TAG, "Mood: 5");
+                        currentMoodInt = 5;
+                        setMoodOnButtons(currentMoodInt);
+                        Logger.verbose(TAG, "Mood: " + currentMoodInt);
                     }
                 });
 
                 ibCurrentMood5.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        ibCurrentMood1.setSelected(true);
-                        ibCurrentMood2.setSelected(true);
-                        ibCurrentMood3.setSelected(true);
-                        ibCurrentMood4.setSelected(true);
-                        ibCurrentMood5.setSelected(true);
-                        ibCurrentMood6.setSelected(false);
-                        Logger.debug(TAG, "Mood: 6");
+                        currentMoodInt = 6;
+                        setMoodOnButtons(currentMoodInt);
+                        Logger.verbose(TAG, "Mood: " + currentMoodInt);
                     }
                 });
 
                 ibCurrentMood6.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        ibCurrentMood1.setSelected(true);
-                        ibCurrentMood2.setSelected(true);
-                        ibCurrentMood3.setSelected(true);
-                        ibCurrentMood4.setSelected(true);
-                        ibCurrentMood5.setSelected(true);
-                        ibCurrentMood6.setSelected(true);
-                        Logger.debug(TAG, "Mood: 7");
+                        currentMoodInt = 7;
+                        setMoodOnButtons(currentMoodInt);
+                        Logger.verbose(TAG, "Mood: " + currentMoodInt);
                     }
                 });
+
+                ibSet.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Logger.debug(TAG, "Mood updated");
+                        Toast.makeText(MainActivity.this, "Updated mood", Toast.LENGTH_SHORT).show();
+                        setDefaultMoodOnButtons();
+                    }
+                });
+
+                /*ibShare.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Logger.debug(TAG, "Mood shared");
+                    }
+                });
+                */
+                setDefaultMoodOnButtons();
             }
         });
     }
+
+    /**
+     * Updates the state of the buttons to the default mood.
+     */
+    private void setDefaultMoodOnButtons() {
+
+        setMoodOnButtons(4);
+    }
+
+    /**
+     * Updates the state of the buttons according to the mood.
+     * @param mood the mood to be set
+     */
+    private void setMoodOnButtons(int mood) {
+
+        for(int i = 0, moodButtonIdx = mood - 1; i < moodButtons.size(); i++) {
+
+            if(i <= moodButtonIdx)
+                moodButtons.get(i).setActivated(true);
+            else
+                moodButtons.get(i).setActivated(false);
+        }
+    }
+
 }
