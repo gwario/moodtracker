@@ -1,6 +1,10 @@
 package at.ameise.moodtracker.app.domain;
 
+import com.google.android.gms.wearable.DataMap;
+
 import org.joda.time.DateTime;
+
+import at.ameise.moodtracker.app.Setting;
 
 /**
  * Representation of a single mood entry.
@@ -27,8 +31,22 @@ public class Mood {
     }
 
     /**
+     * For creation from wearable devices.
+     * TODO maybe use a static method for this
+     */
+    public Mood(DataMap dataMap) {
+
+        final String MOOD_KEY = "com.example.key.mood";
+        final String TIMESTAMP_KEY = "com.example.key.ts";
+        this.mood = dataMap.getInt(MOOD_KEY);
+        this.timestampMs = dataMap.getLong(TIMESTAMP_KEY);;
+        this.scope = MoodTableHelper.EMoodScope.RAW.name();
+    }
+
+    /**
      * For creation from database values.
      * This constructor does not set any fields.
+     * TODO maybe use a static method for this
      */
     Mood() {}
 
@@ -90,6 +108,7 @@ public class Mood {
         return moodModel;
     }
 
+    //TODO maybe use a constructor for this??
     public static Mood getMoodFromModel(at.ameise.moodtracker.moodTrackerBackend.model.Mood moodModel) {
 
         Mood mood = new Mood();

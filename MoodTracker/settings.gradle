@@ -1,1 +1,1 @@
-include ':app', ':wear', ':backend'
+include ':mobile', ':wear', ':backend'

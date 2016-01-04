@@ -8,9 +8,9 @@ import java.util.Locale;
  *
  * Created by Mario Gastegger <mario DOT gastegger AT gmail DOT com> on 05.03.15.
  */
-public class Settings {
+public class Setting {
 
-    private Settings() {}
+    private Setting() {}
 
     public static final boolean APP_MODE_DEBUG = BuildConfig.DEBUG;
 

@@ -127,8 +127,6 @@
             android:background="@drawable/glyphicons_417_disk_saved"
             android:id="@+id/ibSetCurrentMood"
             android:scaleType="centerInside"
-            android:scaleX="2"
-            android:scaleY="2"
             android:layout_gravity="center_vertical"
             android:layout_marginRight="20dp"
             />
