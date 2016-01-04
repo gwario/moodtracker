@@ -7,6 +7,15 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.DataEventBuffer;
+import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
+import com.google.android.gms.wearable.Wearable;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +23,7 @@ import at.ameise.moodtracker.R;
 import at.ameise.moodtracker.util.Logger;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements DataApi.DataListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -33,6 +42,11 @@ public class MainActivity extends Activity {
 
     private List<ImageView> moodButtons;
 
+    private static final String MOOD_KEY = "com.example.key.mood";
+    private static final String TIMESTAMP_KEY = "com.example.key.ts";
+
+    private GoogleApiClient mGoogleApiClient;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +55,12 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         moodButtons = new ArrayList<>();
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+            .addApi(Wearable.API)
+            .addConnectionCallbacks(this)
+            .addOnConnectionFailedListener(this)
+            .build();
 
         final WatchViewStub stub = (WatchViewStub) findViewById(R.id.watch_view_stub);
         stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
@@ -132,6 +152,14 @@ public class MainActivity extends Activity {
                 ibSet.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+
+                        long timestamp = System.currentTimeMillis();
+                        PutDataMapRequest putDataMapReq = PutDataMapRequest.create("/mood/" + timestamp);
+                        putDataMapReq.getDataMap().putInt(MOOD_KEY, currentMoodInt);
+                        putDataMapReq.getDataMap().putLong(TIMESTAMP_KEY, timestamp);
+                        PutDataRequest putDataReq = putDataMapReq.asPutDataRequest();
+                        PendingResult<DataApi.DataItemResult> pendingResult =  Wearable.DataApi.putDataItem(mGoogleApiClient, putDataReq);
+
                         Logger.debug(TAG, "Mood updated");
                         Toast.makeText(MainActivity.this, "Updated mood", Toast.LENGTH_SHORT).show();
                         setDefaultMoodOnButtons();
@@ -173,4 +201,34 @@ public class MainActivity extends Activity {
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mGoogleApiClient.disconnect();
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onDataChanged(DataEventBuffer dataEventBuffer) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
+    }
 }
