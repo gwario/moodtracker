@@ -221,7 +221,7 @@ public class MoodHistoryFragment extends Fragment implements LoaderManager.Loade
                 boolean hasSyncedManually = lastManualSyncTimestamp > 0;
                 long timeSinceLastManualSync = DateTime.now().getMillis() - lastManualSyncTimestamp;
 
-                if(!hasSyncedManually
+                if(Setting.APP_MODE_DEBUG || !hasSyncedManually
                     || timeSinceLastManualSync < Period.minutes(Setting.MANUAL_SYNC_DOWNTIME_M).getMillis()) {
                     Logger.info(TagConstant.SYNCHRONIZATION, "Manually started sync...");
                     MoodSynchronizationService.startActionSynchronizeMoods(getActivity());
