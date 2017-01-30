@@ -40,6 +40,7 @@ android {
         /**
          * Web client ID from Google Cloud console.
          */
-        buildConfigField "String", "WEB_CLIENT_ID", "\"1008624441817-c2fcrutro43qsqcrkn7j91p744iaoofu.apps.googleusercontent.com\""
+        buildConfigField "String", "WEB_CLIENT_ID", "\"\""
+
     }
 }
